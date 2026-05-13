@@ -3,82 +3,114 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ExpenseTrackerApp.Pages.LoginPage"
              Title="Expense Tracker"
-             BackgroundColor="#F5F5F5">
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#F0F2F5">
 
     <ScrollView>
-        <VerticalStackLayout Padding="40,60,40,40" Spacing="0" VerticalOptions="Center">
+        <VerticalStackLayout Padding="48,60,48,40" Spacing="0" VerticalOptions="Center">
 
-            <!-- Logo / titre -->
-            <Label Text="💼" FontSize="60" HorizontalOptions="Center" Margin="0,0,0,8"/>
+            <!-- Logo -->
+            <Label Text="💼" FontSize="56" HorizontalOptions="Center" Margin="0,0,0,6"/>
             <Label Text="Expense Tracker"
-                   FontSize="28" FontAttributes="Bold"
+                   FontSize="26" FontAttributes="Bold"
                    HorizontalOptions="Center"
-                   TextColor="#1A1A2E" Margin="0,0,0,4"/>
-            <Label Text="Sign in to your account"
-                   FontSize="14" TextColor="Gray"
-                   HorizontalOptions="Center" Margin="0,0,0,40"/>
+                   TextColor="#1A202C"/>
+            <Label Text="Connectez-vous à votre compte"
+                   FontSize="14" TextColor="#718096"
+                   HorizontalOptions="Center" Margin="0,4,0,36"/>
 
-            <!-- Card -->
-            <Frame BackgroundColor="White" CornerRadius="16"
-                   Padding="24" HasShadow="True" BorderColor="Transparent">
-                <VerticalStackLayout Spacing="16">
+            <!-- Carte login -->
+            <Border BackgroundColor="White"
+                    StrokeShape="RoundRectangle 16"
+                    Stroke="#E2E8F0"
+                    StrokeThickness="1"
+                    Padding="28,24">
+                <VerticalStackLayout Spacing="18">
 
                     <!-- Email -->
-                    <VerticalStackLayout Spacing="4">
-                        <Label Text="Email" FontSize="13" TextColor="Gray"/>
-                        <Entry x:Name="EmailEntry"
-                               Placeholder="alice@company.com"
-                               Keyboard="Email"
-                               ReturnType="Next"
-                               BackgroundColor="#F8F8F8"/>
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Adresse email" FontSize="13" FontAttributes="Bold" TextColor="#4A5568"/>
+                        <Border BackgroundColor="#F7FAFC"
+                                StrokeShape="RoundRectangle 8"
+                                Stroke="#CBD5E0"
+                                StrokeThickness="1"
+                                Padding="12,0">
+                            <Entry x:Name="EmailEntry"
+                                   Placeholder="alice@company.com"
+                                   PlaceholderColor="#A0AEC0"
+                                   TextColor="#1A202C"
+                                   Keyboard="Email"
+                                   ReturnType="Next"
+                                   HeightRequest="44"
+                                   BackgroundColor="Transparent"/>
+                        </Border>
                     </VerticalStackLayout>
 
                     <!-- Password -->
-                    <VerticalStackLayout Spacing="4">
-                        <Label Text="Password" FontSize="13" TextColor="Gray"/>
-                        <Entry x:Name="PasswordEntry"
-                               Placeholder="••••••••"
-                               IsPassword="True"
-                               ReturnType="Done"
-                               ReturnCommand="{Binding LoginCommand}"
-                               BackgroundColor="#F8F8F8"/>
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Mot de passe" FontSize="13" FontAttributes="Bold" TextColor="#4A5568"/>
+                        <Border BackgroundColor="#F7FAFC"
+                                StrokeShape="RoundRectangle 8"
+                                Stroke="#CBD5E0"
+                                StrokeThickness="1"
+                                Padding="12,0">
+                            <Entry x:Name="PasswordEntry"
+                                   Placeholder="••••••••"
+                                   PlaceholderColor="#A0AEC0"
+                                   TextColor="#1A202C"
+                                   IsPassword="True"
+                                   ReturnType="Done"
+                                   HeightRequest="44"
+                                   BackgroundColor="Transparent"/>
+                        </Border>
                     </VerticalStackLayout>
 
-                    <!-- Error -->
-                    <Label x:Name="ErrorLabel"
-                           TextColor="#E53E3E"
-                           FontSize="13"
-                           IsVisible="False"
-                           HorizontalOptions="Center"/>
+                    <!-- Erreur -->
+                    <Border x:Name="ErrorBox"
+                            BackgroundColor="#FFF5F5"
+                            StrokeShape="RoundRectangle 8"
+                            Stroke="#FC8181"
+                            StrokeThickness="1"
+                            Padding="12,10"
+                            IsVisible="False">
+                        <Label x:Name="ErrorLabel"
+                               TextColor="#C53030"
+                               FontSize="13"
+                               HorizontalOptions="Center"/>
+                    </Border>
 
-                    <!-- Login Button -->
+                    <!-- Bouton -->
                     <Button x:Name="LoginButton"
-                            Text="Sign In"
+                            Text="Se connecter"
                             Clicked="OnLoginClicked"
                             BackgroundColor="#FF9900"
                             TextColor="White"
                             CornerRadius="10"
                             HeightRequest="48"
                             FontAttributes="Bold"
-                            Margin="0,8,0,0"/>
+                            FontSize="15"
+                            Margin="0,4,0,0"/>
 
                     <ActivityIndicator x:Name="Loader"
-                                       IsVisible="False"
-                                       IsRunning="False"
+                                       IsVisible="False" IsRunning="False"
                                        Color="#FF9900"
                                        HorizontalOptions="Center"/>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- Comptes de test -->
-            <Frame BackgroundColor="#FFF8E1" CornerRadius="10"
-                   Padding="16" BorderColor="#FFE082" Margin="0,24,0,0">
+            <Border BackgroundColor="#FFFBEB"
+                    StrokeShape="RoundRectangle 10"
+                    Stroke="#FBD38D"
+                    StrokeThickness="1"
+                    Padding="16,12"
+                    Margin="0,20,0,0">
                 <VerticalStackLayout Spacing="4">
-                    <Label Text="🧪 Test accounts" FontAttributes="Bold" FontSize="13"/>
-                    <Label Text="Employee : alice@test.com / Employee1234!" FontSize="12" TextColor="Gray"/>
-                    <Label Text="Finance  : bob@test.com / Manager1234!"   FontSize="12" TextColor="Gray"/>
+                    <Label Text="🧪 Comptes de test" FontAttributes="Bold" FontSize="13" TextColor="#744210"/>
+                    <Label Text="Employé  : alice@test.com / Employee1234!" FontSize="12" TextColor="#975A16"/>
+                    <Label Text="Finance  : bob@test.com / Manager1234!"    FontSize="12" TextColor="#975A16"/>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
         </VerticalStackLayout>
     </ScrollView>

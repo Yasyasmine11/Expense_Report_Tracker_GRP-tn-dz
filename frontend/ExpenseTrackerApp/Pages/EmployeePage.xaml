@@ -2,116 +2,174 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ExpenseTrackerApp.Pages.EmployeePage"
-             Title="My Expenses"
-             BackgroundColor="#F5F5F5">
+             Title="Mes Notes de Frais"
+             BackgroundColor="#F0F2F5">
 
     <Shell.TitleView>
-        <Grid ColumnDefinitions="*,Auto">
-            <Label Text="My Expenses" FontSize="18" FontAttributes="Bold"
-                   VerticalOptions="Center" TextColor="White"/>
-            <Button Grid.Column="1" Text="Logout" FontSize="12"
-                    BackgroundColor="Transparent" TextColor="White"
+        <Grid ColumnDefinitions="*,Auto" Padding="0,0,8,0">
+            <Label Text="💼 Mes Notes de Frais"
+                   FontSize="17" FontAttributes="Bold"
+                   TextColor="White" VerticalOptions="Center"/>
+            <Button Grid.Column="1"
+                    Text="Déconnexion"
+                    FontSize="12"
+                    BackgroundColor="Transparent"
+                    TextColor="White"
+                    BorderColor="White"
+                    BorderWidth="1"
+                    CornerRadius="6"
+                    Padding="10,4"
                     Clicked="OnLogoutClicked"/>
         </Grid>
     </Shell.TitleView>
 
-    <Grid RowDefinitions="Auto,*,Auto" Padding="16">
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="16,12,16,16" RowSpacing="12">
 
-        <!-- Stats rapides -->
-        <HorizontalStackLayout Grid.Row="0" Spacing="12" Margin="0,0,0,16">
-            <Frame x:Name="DraftBadge" BackgroundColor="White" CornerRadius="10"
-                   Padding="12,8" BorderColor="Transparent">
+        <!-- Bandeau utilisateur -->
+        <Border Grid.Row="0"
+                BackgroundColor="#FF9900"
+                StrokeShape="RoundRectangle 12"
+                Stroke="Transparent"
+                Padding="16,12">
+            <Grid ColumnDefinitions="*,Auto">
                 <VerticalStackLayout>
-                    <Label x:Name="DraftCount" Text="0" FontSize="20"
-                           FontAttributes="Bold" HorizontalOptions="Center" TextColor="Gray"/>
-                    <Label Text="Draft" FontSize="11" TextColor="Gray" HorizontalOptions="Center"/>
+                    <Label x:Name="WelcomeLabel"
+                           Text="Bonjour 👋"
+                           FontSize="16" FontAttributes="Bold"
+                           TextColor="White"/>
+                    <Label Text="Gérez vos notes de frais"
+                           FontSize="12" TextColor="#FFF3E0"/>
                 </VerticalStackLayout>
-            </Frame>
-            <Frame BackgroundColor="White" CornerRadius="10"
-                   Padding="12,8" BorderColor="Transparent">
-                <VerticalStackLayout>
-                    <Label x:Name="SubmittedCount" Text="0" FontSize="20"
-                           FontAttributes="Bold" HorizontalOptions="Center" TextColor="Orange"/>
-                    <Label Text="Pending" FontSize="11" TextColor="Gray" HorizontalOptions="Center"/>
+                <Label Grid.Column="1"
+                       x:Name="TotalLabel"
+                       Text="€0.00"
+                       FontSize="22" FontAttributes="Bold"
+                       TextColor="White" VerticalOptions="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- Stats -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="10">
+
+            <Border BackgroundColor="White" StrokeShape="RoundRectangle 10"
+                    Stroke="#E2E8F0" Padding="12,10">
+                <VerticalStackLayout HorizontalOptions="Center">
+                    <Label x:Name="DraftCount" Text="0" FontSize="22" FontAttributes="Bold"
+                           TextColor="#718096" HorizontalOptions="Center"/>
+                    <Label Text="Brouillons" FontSize="11" TextColor="#A0AEC0" HorizontalOptions="Center"/>
                 </VerticalStackLayout>
-            </Frame>
-            <Frame BackgroundColor="White" CornerRadius="10"
-                   Padding="12,8" BorderColor="Transparent">
-                <VerticalStackLayout>
-                    <Label x:Name="ApprovedCount" Text="0" FontSize="20"
-                           FontAttributes="Bold" HorizontalOptions="Center" TextColor="Green"/>
-                    <Label Text="Approved" FontSize="11" TextColor="Gray" HorizontalOptions="Center"/>
+            </Border>
+
+            <Border Grid.Column="1" BackgroundColor="White" StrokeShape="RoundRectangle 10"
+                    Stroke="#E2E8F0" Padding="12,10">
+                <VerticalStackLayout HorizontalOptions="Center">
+                    <Label x:Name="SubmittedCount" Text="0" FontSize="22" FontAttributes="Bold"
+                           TextColor="#DD6B20" HorizontalOptions="Center"/>
+                    <Label Text="En attente" FontSize="11" TextColor="#A0AEC0" HorizontalOptions="Center"/>
                 </VerticalStackLayout>
-            </Frame>
-        </HorizontalStackLayout>
+            </Border>
+
+            <Border Grid.Column="2" BackgroundColor="White" StrokeShape="RoundRectangle 10"
+                    Stroke="#E2E8F0" Padding="12,10">
+                <VerticalStackLayout HorizontalOptions="Center">
+                    <Label x:Name="ApprovedCount" Text="0" FontSize="22" FontAttributes="Bold"
+                           TextColor="#276749" HorizontalOptions="Center"/>
+                    <Label Text="Approuvées" FontSize="11" TextColor="#A0AEC0" HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
 
         <!-- Liste -->
-        <RefreshView Grid.Row="1" x:Name="RefreshView" Refreshing="OnRefresh" >
-            <CollectionView x:Name="ExpensesList" EmptyView="No expenses yet. Create one below!">
+        <RefreshView Grid.Row="2" x:Name="RefreshView" Refreshing="OnRefresh">
+            <CollectionView x:Name="ExpensesList">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="12">
+                        <Label Text="📋" FontSize="48" HorizontalOptions="Center"/>
+                        <Label Text="Aucune note de frais" FontSize="16" FontAttributes="Bold"
+                               TextColor="#4A5568" HorizontalOptions="Center"/>
+                        <Label Text="Créez votre première note ci-dessous"
+                               FontSize="13" TextColor="#A0AEC0" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Frame Margin="0,4" Padding="14" CornerRadius="12"
-                               BackgroundColor="White" BorderColor="Transparent" HasShadow="False">
-                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
+                        <Border Margin="0,5"
+                                BackgroundColor="White"
+                                StrokeShape="RoundRectangle 12"
+                                Stroke="#E2E8F0"
+                                StrokeThickness="1"
+                                Padding="16,14">
+                            <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="6">
 
+                                <!-- Ligne 1 : description + montant -->
                                 <Label Grid.Row="0" Grid.Column="0"
                                        Text="{Binding Description}"
-                                       FontAttributes="Bold" FontSize="15"/>
+                                       FontAttributes="Bold" FontSize="15"
+                                       TextColor="#1A202C" LineBreakMode="TailTruncation"/>
 
                                 <Label Grid.Row="0" Grid.Column="1"
                                        Text="{Binding AmountFormatted}"
-                                       FontAttributes="Bold" FontSize="16"
-                                       TextColor="#FF9900" HorizontalOptions="End"/>
+                                       FontAttributes="Bold" FontSize="17"
+                                       TextColor="#FF9900" HorizontalOptions="End"
+                                       VerticalOptions="Start"/>
 
+                                <!-- Ligne 2 : catégorie + statut -->
                                 <Label Grid.Row="1" Grid.Column="0"
                                        Text="{Binding Category}"
-                                       TextColor="Gray" FontSize="12" Margin="0,2,0,0"/>
+                                       TextColor="#718096" FontSize="13"/>
 
-                                <Label Grid.Row="1" Grid.Column="1"
-                                       Text="{Binding StatusBadge}"
-                                       FontSize="12" HorizontalOptions="End"
-                                       TextColor="{Binding StatusColor}"/>
+                                <Border Grid.Row="1" Grid.Column="1"
+                                        BackgroundColor="{Binding StatusBgColor}"
+                                        StrokeShape="RoundRectangle 12"
+                                        Stroke="Transparent"
+                                        Padding="8,3"
+                                        HorizontalOptions="End">
+                                    <Label Text="{Binding StatusLabel}"
+                                           FontSize="11" FontAttributes="Bold"
+                                           TextColor="{Binding StatusColor}"/>
+                                </Border>
 
-                                <!-- Bouton Submit (visible seulement si CanSubmit) -->
+                                <!-- Ligne 3 : actions -->
                                 <HorizontalStackLayout Grid.Row="2" Grid.ColumnSpan="2"
-                                    Margin="0,8,0,0" Spacing="8"
+                                    Margin="0,6,0,0" Spacing="10"
                                     IsVisible="{Binding CanSubmit}">
-                                    <Button Text="📤 Submit"
+                                    <Button Text="📤 Soumettre"
                                             BackgroundColor="#FF9900" TextColor="White"
-                                            CornerRadius="6" FontSize="12" HeightRequest="34"
+                                            CornerRadius="8" FontSize="12"
+                                            HeightRequest="36" Padding="12,0"
                                             CommandParameter="{Binding ExpenseId}"
                                             Clicked="OnSubmitClicked"/>
-                                    <Button Text="📎 Attach receipt"
-                                            BackgroundColor="#E8F4FD" TextColor="#2B6CB0"
-                                            CornerRadius="6" FontSize="12" HeightRequest="34"
-                                            CommandParameter="{Binding ExpenseId}"
-                                            Clicked="OnUploadReceiptClicked"
-                                            IsVisible="{Binding CanUploadReceipt}"/>
                                 </HorizontalStackLayout>
 
-                                <!-- Justification si rejeté -->
-                                <Label Grid.Row="2" Grid.ColumnSpan="2"
-                                       Text="{Binding Justification, StringFormat='Reason: {0}'}"
-                                       TextColor="Red" FontSize="12" Margin="0,6,0,0"
-                                       IsVisible="{Binding Justification, Converter={StaticResource NotEmptyConverter}}"/>
+                                <!-- Justification rejet -->
+                                <Border Grid.Row="2" Grid.ColumnSpan="2"
+                                        BackgroundColor="#FFF5F5"
+                                        StrokeShape="RoundRectangle 8"
+                                        Stroke="#FC8181"
+                                        Padding="10,6"
+                                        Margin="0,6,0,0"
+                                        IsVisible="{Binding HasJustification}">
+                                    <Label Text="{Binding Justification, StringFormat='Motif : {0}'}"
+                                           TextColor="#C53030" FontSize="12"/>
+                                </Border>
+
                             </Grid>
-                        </Frame>
+                        </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </RefreshView>
 
         <!-- Bouton créer -->
-        <Button Grid.Row="2"
-                Text="+ New Expense"
+        <Button Grid.Row="3"
+                Text="＋ Nouvelle note de frais"
                 Clicked="OnCreateClicked"
                 BackgroundColor="#FF9900"
                 TextColor="White"
                 CornerRadius="12"
-                HeightRequest="50"
+                HeightRequest="52"
                 FontAttributes="Bold"
-                FontSize="16"
-                Margin="0,12,0,0"/>
+                FontSize="15"/>
 
     </Grid>
 </ContentPage>

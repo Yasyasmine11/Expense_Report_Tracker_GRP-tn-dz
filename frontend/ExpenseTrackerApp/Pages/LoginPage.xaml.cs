@@ -13,7 +13,7 @@ public partial class LoginPage : ContentPage
         if (string.IsNullOrWhiteSpace(EmailEntry.Text) ||
             string.IsNullOrWhiteSpace(PasswordEntry.Text))
         {
-            ShowError("Please enter your email and password.");
+            ShowError("Veuillez saisir votre email et mot de passe.");
             return;
         }
 
@@ -31,7 +31,6 @@ public partial class LoginPage : ContentPage
             return;
         }
 
-        // Rediriger selon le rôle
         if (result.IsFinanceManager)
             await Shell.Current.GoToAsync("//ManagerPage");
         else
@@ -40,15 +39,15 @@ public partial class LoginPage : ContentPage
 
     private void ShowError(string msg)
     {
-        ErrorLabel.Text      = msg;
-        ErrorLabel.IsVisible = true;
+        ErrorLabel.Text     = msg;
+        ErrorBox.IsVisible  = true;
     }
 
     private void SetLoading(bool loading)
     {
-        Loader.IsVisible     = loading;
-        Loader.IsRunning     = loading;
+        Loader.IsVisible      = loading;
+        Loader.IsRunning      = loading;
         LoginButton.IsEnabled = !loading;
-        ErrorLabel.IsVisible  = false;
+        ErrorBox.IsVisible    = false;
     }
 }

@@ -2,90 +2,150 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ExpenseTrackerApp.Pages.ManagerPage"
-             Title="Pending Approvals"
-             BackgroundColor="#F5F5F5">
+             Title="Approbations"
+             BackgroundColor="#F0F2F5">
 
     <Shell.TitleView>
-        <Grid ColumnDefinitions="*,Auto">
-            <Label Text="Pending Approvals" FontSize="18" FontAttributes="Bold"
-                   VerticalOptions="Center" TextColor="White"/>
-            <Button Grid.Column="1" Text="Logout" FontSize="12"
-                    BackgroundColor="Transparent" TextColor="White"
+        <Grid ColumnDefinitions="*,Auto" Padding="0,0,8,0">
+            <Label Text="✅ Tableau de bord Finance"
+                   FontSize="17" FontAttributes="Bold"
+                   TextColor="White" VerticalOptions="Center"/>
+            <Button Grid.Column="1"
+                    Text="Déconnexion"
+                    FontSize="12"
+                    BackgroundColor="Transparent"
+                    TextColor="White"
+                    BorderColor="White"
+                    BorderWidth="1"
+                    CornerRadius="6"
+                    Padding="10,4"
                     Clicked="OnLogoutClicked"/>
         </Grid>
     </Shell.TitleView>
 
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="Auto,*" Padding="16,12,16,16" RowSpacing="12">
 
-        <!-- Header stats -->
-        <Frame Grid.Row="0" BackgroundColor="#FF9900" CornerRadius="0"
-               Padding="16,12" BorderColor="Transparent">
-            <HorizontalStackLayout Spacing="8">
-                <Label Text="📋" FontSize="20"/>
-                <Label x:Name="PendingCountLabel"
-                       Text="0 expenses waiting for review"
-                       TextColor="White" FontSize="15" FontAttributes="Bold"
-                       VerticalOptions="Center"/>
-            </HorizontalStackLayout>
-        </Frame>
+        <!-- Bandeau stats -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,*,*" ColumnSpacing="10">
 
-        <!-- Liste des expenses à reviewer -->
+            <Border BackgroundColor="#FF9900" StrokeShape="RoundRectangle 10" Stroke="Transparent" Padding="12,10">
+                <VerticalStackLayout HorizontalOptions="Center">
+                    <Label x:Name="SubmittedCountLabel" Text="0"
+                           FontSize="22" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center"/>
+                    <Label Text="En attente" FontSize="11" TextColor="#FFF3E0" HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Grid.Column="1" BackgroundColor="#276749" StrokeShape="RoundRectangle 10" Stroke="Transparent" Padding="12,10">
+                <VerticalStackLayout HorizontalOptions="Center">
+                    <Label x:Name="ApprovedCountLabel" Text="0"
+                           FontSize="22" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center"/>
+                    <Label Text="Approuvées" FontSize="11" TextColor="#C6F6D5" HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Grid.Column="2" BackgroundColor="#9B2C2C" StrokeShape="RoundRectangle 10" Stroke="Transparent" Padding="12,10">
+                <VerticalStackLayout HorizontalOptions="Center">
+                    <Label x:Name="RejectedCountLabel" Text="0"
+                           FontSize="22" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center"/>
+                    <Label Text="Rejetées" FontSize="11" TextColor="#FED7D7" HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- Liste -->
         <RefreshView Grid.Row="1" x:Name="RefreshView" Refreshing="OnRefresh">
-            <CollectionView x:Name="PendingList"
-                            Margin="16"
-                            EmptyView="🎉 No pending expenses!">
+            <CollectionView x:Name="ExpenseList">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="12">
+                        <Label Text="🎉" FontSize="48" HorizontalOptions="Center"/>
+                        <Label Text="Aucune note en attente"
+                               FontSize="16" FontAttributes="Bold"
+                               TextColor="#4A5568" HorizontalOptions="Center"/>
+                        <Label Text="Toutes les notes ont été traitées"
+                               FontSize="13" TextColor="#A0AEC0" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Frame Margin="0,6" Padding="16" CornerRadius="14"
-                               BackgroundColor="White" BorderColor="Transparent" HasShadow="False">
+                        <Border Margin="0,5"
+                                BackgroundColor="White"
+                                StrokeShape="RoundRectangle 14"
+                                Stroke="#E2E8F0"
+                                StrokeThickness="1"
+                                Padding="16,14">
                             <VerticalStackLayout Spacing="10">
 
-                                <!-- Montant + catégorie -->
+                                <!-- Montant + description -->
                                 <Grid ColumnDefinitions="*,Auto">
                                     <VerticalStackLayout>
                                         <Label Text="{Binding Description}"
-                                               FontAttributes="Bold" FontSize="16"/>
+                                               FontAttributes="Bold" FontSize="16"
+                                               TextColor="#1A202C" LineBreakMode="TailTruncation"/>
                                         <Label Text="{Binding Category}"
-                                               TextColor="Gray" FontSize="13"/>
+                                               TextColor="#718096" FontSize="13"/>
                                     </VerticalStackLayout>
-                                    <Label Grid.Column="1"
-                                           Text="{Binding AmountFormatted}"
-                                           FontAttributes="Bold" FontSize="22"
-                                           TextColor="#FF9900" VerticalOptions="Center"/>
+                                    <VerticalStackLayout Grid.Column="1" HorizontalOptions="End">
+                                        <Label Text="{Binding AmountFormatted}"
+                                               FontAttributes="Bold" FontSize="24"
+                                               TextColor="#FF9900" HorizontalOptions="End"/>
+                                        <Border BackgroundColor="{Binding StatusBgColor}"
+                                                StrokeShape="RoundRectangle 10"
+                                                Stroke="Transparent" Padding="8,3"
+                                                HorizontalOptions="End">
+                                            <Label Text="{Binding StatusLabel}"
+                                                   FontSize="11" FontAttributes="Bold"
+                                                   TextColor="{Binding StatusColor}"/>
+                                        </Border>
+                                    </VerticalStackLayout>
                                 </Grid>
 
-                                <!-- Infos utilisateur -->
-                                <Label Text="{Binding UserEmail, StringFormat='👤 {0}'}"
-                                       TextColor="#555" FontSize="13"/>
-                                <Label Text="{Binding CreatedAt, StringFormat='📅 Submitted: {0}'}"
-                                       TextColor="Gray" FontSize="12"/>
+                                <!-- Infos employé -->
+                                <Border BackgroundColor="#F7FAFC" StrokeShape="RoundRectangle 8"
+                                        Stroke="#E2E8F0" Padding="10,8">
+                                    <VerticalStackLayout Spacing="3">
+                                        <Label Text="{Binding UserEmail, StringFormat='👤 {0}'}"
+                                               TextColor="#4A5568" FontSize="13"/>
+                                        <Label Text="{Binding CreatedAt, StringFormat='📅 {0}'}"
+                                               TextColor="#A0AEC0" FontSize="12"/>
+                                    </VerticalStackLayout>
+                                </Border>
 
-                                <BoxView HeightRequest="1" Color="#F0F0F0"/>
+                                <!-- Justification rejet si présente -->
+                                <Border BackgroundColor="#FFF5F5"
+                                        StrokeShape="RoundRectangle 8"
+                                        Stroke="#FC8181"
+                                        Padding="10,8"
+                                        IsVisible="{Binding HasJustification}">
+                                    <Label Text="{Binding Justification, StringFormat='Motif rejet : {0}'}"
+                                           TextColor="#C53030" FontSize="12"/>
+                                </Border>
 
-                                <!-- Boutons Approve / Reject -->
-                                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                <!-- Boutons Approve / Reject — visibles seulement si SUBMITTED -->
+                                <Grid ColumnDefinitions="*,*" ColumnSpacing="10"
+                                      IsVisible="{Binding CanReview}">
                                     <Button Grid.Column="0"
-                                            Text="✅ Approve"
-                                            BackgroundColor="#38A169"
+                                            Text="✅ Approuver"
+                                            BackgroundColor="#276749"
                                             TextColor="White"
                                             CornerRadius="10"
-                                            HeightRequest="44"
+                                            HeightRequest="46"
                                             FontAttributes="Bold"
                                             CommandParameter="{Binding .}"
                                             Clicked="OnApproveClicked"/>
                                     <Button Grid.Column="1"
-                                            Text="❌ Reject"
-                                            BackgroundColor="#E53E3E"
+                                            Text="❌ Rejeter"
+                                            BackgroundColor="#9B2C2C"
                                             TextColor="White"
                                             CornerRadius="10"
-                                            HeightRequest="44"
+                                            HeightRequest="46"
                                             FontAttributes="Bold"
                                             CommandParameter="{Binding .}"
                                             Clicked="OnRejectClicked"/>
                                 </Grid>
 
                             </VerticalStackLayout>
-                        </Frame>
+                        </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>

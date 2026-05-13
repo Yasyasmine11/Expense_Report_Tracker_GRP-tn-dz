@@ -6,28 +6,30 @@ namespace ExpenseTrackerApp.Pages;
 public partial class ManagerPage : ContentPage
 {
     private readonly ExpenseService _service = new();
-    private List<ExpenseReport> _pending     = new();
+    private List<ExpenseReport> _all = new();
 
     public ManagerPage() => InitializeComponent();
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await LoadPendingAsync();
+        await LoadExpensesAsync();
     }
 
-    private async Task LoadPendingAsync()
+    private async Task LoadExpensesAsync()
     {
         try
         {
-            _pending = await _service.GetPendingExpensesAsync();
-            PendingList.ItemsSource = _pending;
-            PendingCountLabel.Text  =
-                $"{_pending.Count} expense{(_pending.Count != 1 ? "s" : "")} waiting for review";
+            _all = await _service.GetPendingExpensesAsync();
+            ExpenseList.ItemsSource = _all;
+
+            SubmittedCountLabel.Text = _all.Count(e => e.Status == "SUBMITTED").ToString();
+            ApprovedCountLabel.Text  = _all.Count(e => e.Status == "APPROVED").ToString();
+            RejectedCountLabel.Text  = _all.Count(e => e.Status == "REJECTED").ToString();
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Error", $"Could not load pending expenses: {ex.Message}", "OK");
+            await DisplayAlert("Erreur", $"Impossible de charger les notes : {ex.Message}", "OK");
         }
         finally
         {
@@ -37,59 +39,52 @@ public partial class ManagerPage : ContentPage
 
     private async void OnApproveClicked(object sender, EventArgs e)
     {
-        if (sender is not Button btn || btn.CommandParameter is not ExpenseReport expense)
-            return;
+        if (sender is not Button btn || btn.CommandParameter is not ExpenseReport expense) return;
 
         bool confirm = await DisplayAlert(
-            "Approve Expense",
-            $"Approve €{expense.Amount:F2} — \"{expense.Description}\"?",
-            "Approve", "Cancel");
+            "Approuver",
+            $"Approuver {expense.AmountFormatted} — \"{expense.Description}\" ?",
+            "Approuver", "Annuler");
 
         if (!confirm) return;
 
         var ok = await _service.ApproveExpenseAsync(expense.ExpenseId, expense.UserId);
 
         await DisplayAlert(
-            ok ? "Approved" : "Error",
-            ok ? "Expense approved successfully." : "Failed to approve expense.",
+            ok ? "Approuvée ✅" : "Erreur",
+            ok ? "Note de frais approuvée." : "Impossible d'approuver.",
             "OK");
 
-        if (ok) await LoadPendingAsync();
+        if (ok) await LoadExpensesAsync();
     }
 
     private async void OnRejectClicked(object sender, EventArgs e)
     {
-        if (sender is not Button btn || btn.CommandParameter is not ExpenseReport expense)
-            return;
+        if (sender is not Button btn || btn.CommandParameter is not ExpenseReport expense) return;
 
-        // Demander la justification via une popup
         var justification = await DisplayPromptAsync(
-            "Reject Expense",
-            "Please provide a justification for the rejection:",
-            placeholder: "e.g. Receipt missing, policy violation...",
+            "Motif du rejet",
+            "Veuillez indiquer la raison du rejet :",
+            placeholder: "Ex : Reçu manquant, non conforme à la politique...",
             maxLength: 300);
 
         if (string.IsNullOrWhiteSpace(justification))
         {
-            await DisplayAlert("Required", "A justification is required to reject an expense.", "OK");
+            await DisplayAlert("Requis", "Un motif est obligatoire pour rejeter.", "OK");
             return;
         }
 
-        var ok = await _service.RejectExpenseAsync(
-            expense.ExpenseId, expense.UserId, justification);
+        var ok = await _service.RejectExpenseAsync(expense.ExpenseId, expense.UserId, justification);
 
         await DisplayAlert(
-            ok ? "Rejected" : "Error",
-            ok ? "Expense rejected." : "Failed to reject expense.",
+            ok ? "Rejetée ❌" : "Erreur",
+            ok ? "Note de frais rejetée." : "Impossible de rejeter.",
             "OK");
 
-        if (ok) await LoadPendingAsync();
+        if (ok) await LoadExpensesAsync();
     }
 
-    private async void OnRefresh(object sender, EventArgs e)
-    {
-        await LoadPendingAsync();
-    }
+    private async void OnRefresh(object sender, EventArgs e) => await LoadExpensesAsync();
 
     private async void OnLogoutClicked(object sender, EventArgs e)
     {

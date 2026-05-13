@@ -2,7 +2,6 @@ using Amazon;
 using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
 using ExpenseTrackerApp.Models;
-using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace ExpenseTrackerApp.Services;
@@ -10,9 +9,12 @@ namespace ExpenseTrackerApp.Services;
 public class AuthService
 {
     private readonly AmazonCognitoIdentityProviderClient _cognito;
-    private static string? _accessToken;
+
+    // IdToken is used for API calls — it contains cognito:groups + sub + email claims
+    private static string? _idToken;
     private static string? _userId;
-    private static bool _isFinanceManager;
+    private static string? _userEmail;
+    private static bool    _isFinanceManager;
 
     public AuthService()
     {
@@ -36,60 +38,64 @@ public class AuthService
             });
 
             var tokens = response.AuthenticationResult;
-            _accessToken = tokens.AccessToken;
 
-            // Décoder le JWT pour extraire les claims (sub, email, groups)
-            var handler   = new JwtSecurityTokenHandler();
-            var jwt       = handler.ReadJwtToken(tokens.IdToken);
-            var sub       = jwt.Claims.FirstOrDefault(c => c.Type == "sub")?.Value ?? "";
-            var groups    = jwt.Claims
-                               .Where(c => c.Type == "cognito:groups")
-                               .Select(c => c.Value)
-                               .ToList();
+            // Decode IdToken — it contains sub, email, cognito:groups
+            var handler = new JwtSecurityTokenHandler();
+            var jwt     = handler.ReadJwtToken(tokens.IdToken);
 
-            _userId          = sub;
+            var sub    = jwt.Claims.FirstOrDefault(c => c.Type == "sub")?.Value    ?? "";
+            var mail   = jwt.Claims.FirstOrDefault(c => c.Type == "email")?.Value  ?? email;
+            var groups = jwt.Claims.Where(c => c.Type == "cognito:groups")
+                                   .Select(c => c.Value)
+                                   .ToList();
+
+            _idToken          = tokens.IdToken;   // ← use IdToken for API calls
+            _userId           = sub;
+            _userEmail        = mail;
             _isFinanceManager = groups.Contains("finance");
 
-            // Stocker le token de façon sécurisée
-            await SecureStorage.SetAsync("access_token", tokens.AccessToken);
-            await SecureStorage.SetAsync("user_id",      sub);
-            await SecureStorage.SetAsync("is_finance",   _isFinanceManager.ToString());
+            await SecureStorage.SetAsync("id_token",   tokens.IdToken);
+            await SecureStorage.SetAsync("user_id",    sub);
+            await SecureStorage.SetAsync("user_email", mail);
+            await SecureStorage.SetAsync("is_finance", _isFinanceManager.ToString());
 
             return new LoginResult
             {
                 Success          = true,
-                AccessToken      = tokens.AccessToken,
                 IdToken          = tokens.IdToken,
                 IsFinanceManager = _isFinanceManager,
-                Email            = email,
+                Email            = mail,
                 UserId           = sub
             };
         }
         catch (NotAuthorizedException)
         {
-            return new LoginResult { Success = false, ErrorMessage = "Incorrect username or password." };
+            return new LoginResult { Success = false, ErrorMessage = "Email ou mot de passe incorrect." };
         }
         catch (UserNotFoundException)
         {
-            return new LoginResult { Success = false, ErrorMessage = "User not found." };
+            return new LoginResult { Success = false, ErrorMessage = "Utilisateur introuvable." };
         }
         catch (Exception ex)
         {
-            return new LoginResult { Success = false, ErrorMessage = $"Login error: {ex.Message}" };
+            return new LoginResult { Success = false, ErrorMessage = $"Erreur de connexion : {ex.Message}" };
         }
     }
 
     public async Task LogoutAsync()
     {
-        SecureStorage.Remove("access_token");
+        SecureStorage.Remove("id_token");
         SecureStorage.Remove("user_id");
+        SecureStorage.Remove("user_email");
         SecureStorage.Remove("is_finance");
-        _accessToken      = null;
+        _idToken          = null;
         _userId           = null;
+        _userEmail        = null;
         _isFinanceManager = false;
     }
 
-    public static string? GetAccessToken() => _accessToken;
-    public static string? GetUserId()      => _userId;
-    public static bool IsFinance()         => _isFinanceManager;
+    public static string? GetIdToken()    => _idToken;
+    public static string? GetUserId()     => _userId;
+    public static string? GetUserEmail()  => _userEmail;
+    public static bool    IsFinance()     => _isFinanceManager;
 }

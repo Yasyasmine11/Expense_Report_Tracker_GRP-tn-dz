@@ -2,77 +2,111 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ExpenseTrackerApp.Pages.CreateExpensePage"
-             Title="New Expense"
-             BackgroundColor="#F5F5F5">
+             Title="Nouvelle note de frais"
+             BackgroundColor="#F0F2F5">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="16">
+        <VerticalStackLayout Padding="20,16" Spacing="14">
 
-            <Label Text="Create Expense Report"
-                   FontSize="22" FontAttributes="Bold" TextColor="#1A1A2E"/>
+            <Label Text="📝 Nouvelle note de frais"
+                   FontSize="20" FontAttributes="Bold"
+                   TextColor="#1A202C"/>
 
-            <!-- Amount -->
-            <Frame BackgroundColor="White" CornerRadius="12" Padding="16" BorderColor="Transparent">
+            <!-- Montant -->
+            <Border BackgroundColor="White" StrokeShape="RoundRectangle 12"
+                    Stroke="#E2E8F0" Padding="16,14">
                 <VerticalStackLayout Spacing="8">
-                    <Label Text="Amount (€)" FontAttributes="Bold" TextColor="#444"/>
-                    <Entry x:Name="AmountEntry"
-                           Placeholder="0.00"
-                           Keyboard="Numeric"
-                           FontSize="24"
-                           FontAttributes="Bold"
-                           TextColor="#FF9900"/>
+                    <Label Text="Montant (€)" FontAttributes="Bold" FontSize="13" TextColor="#4A5568"/>
+                    <Border BackgroundColor="#F7FAFC" StrokeShape="RoundRectangle 8"
+                            Stroke="#CBD5E0" Padding="12,0">
+                        <Entry x:Name="AmountEntry"
+                               Placeholder="0.00"
+                               PlaceholderColor="#A0AEC0"
+                               Keyboard="Numeric"
+                               FontSize="28" FontAttributes="Bold"
+                               TextColor="#FF9900"
+                               HeightRequest="52"
+                               BackgroundColor="Transparent"/>
+                    </Border>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
-            <!-- Category -->
-            <Frame BackgroundColor="White" CornerRadius="12" Padding="16" BorderColor="Transparent">
+            <!-- Catégorie -->
+            <Border BackgroundColor="White" StrokeShape="RoundRectangle 12"
+                    Stroke="#E2E8F0" Padding="16,14">
                 <VerticalStackLayout Spacing="8">
-                    <Label Text="Category" FontAttributes="Bold" TextColor="#444"/>
-                    <Picker x:Name="CategoryPicker" Title="Select a category">
-                        <Picker.Items>
-                            <x:String>TRAVEL</x:String>
-                            <x:String>MEAL</x:String>
-                            <x:String>EQUIPMENT</x:String>
-                            <x:String>OTHER</x:String>
-                        </Picker.Items>
-                    </Picker>
+                    <Label Text="Catégorie" FontAttributes="Bold" FontSize="13" TextColor="#4A5568"/>
+                    <Border BackgroundColor="#F7FAFC" StrokeShape="RoundRectangle 8"
+                            Stroke="#CBD5E0" Padding="12,4">
+                        <Picker x:Name="CategoryPicker"
+                                Title="Sélectionner une catégorie"
+                                TitleColor="#A0AEC0"
+                                TextColor="#1A202C"
+                                BackgroundColor="Transparent">
+                            <Picker.Items>
+                                <x:String>TRANSPORT</x:String>
+                                <x:String>REPAS</x:String>
+                                <x:String>HÉBERGEMENT</x:String>
+                                <x:String>MATÉRIEL</x:String>
+                                <x:String>AUTRE</x:String>
+                            </Picker.Items>
+                        </Picker>
+                    </Border>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- Description -->
-            <Frame BackgroundColor="White" CornerRadius="12" Padding="16" BorderColor="Transparent">
+            <Border BackgroundColor="White" StrokeShape="RoundRectangle 12"
+                    Stroke="#E2E8F0" Padding="16,14">
                 <VerticalStackLayout Spacing="8">
-                    <Label Text="Description" FontAttributes="Bold" TextColor="#444"/>
-                    <Editor x:Name="DescriptionEditor"
-                            Placeholder="e.g. Client lunch at Le Marais"
-                            HeightRequest="100"
-                            BackgroundColor="Transparent"/>
+                    <Label Text="Description" FontAttributes="Bold" FontSize="13" TextColor="#4A5568"/>
+                    <Border BackgroundColor="#F7FAFC" StrokeShape="RoundRectangle 8"
+                            Stroke="#CBD5E0" Padding="12,8">
+                        <Editor x:Name="DescriptionEditor"
+                                Placeholder="Ex : Déjeuner client, billet de train Paris-Lyon..."
+                                PlaceholderColor="#A0AEC0"
+                                TextColor="#1A202C"
+                                HeightRequest="100"
+                                BackgroundColor="Transparent"/>
+                    </Border>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
-            <!-- Error -->
-            <Label x:Name="ErrorLabel" TextColor="Red" IsVisible="False" HorizontalOptions="Center"/>
+            <!-- Erreur -->
+            <Border x:Name="ErrorBox"
+                    BackgroundColor="#FFF5F5"
+                    StrokeShape="RoundRectangle 8"
+                    Stroke="#FC8181"
+                    Padding="14,10"
+                    IsVisible="False">
+                <Label x:Name="ErrorLabel" TextColor="#C53030" FontSize="13"/>
+            </Border>
 
-            <!-- Buttons -->
-            <Button Text="Save as Draft"
+            <!-- Indicateur -->
+            <ActivityIndicator x:Name="Loader"
+                               IsVisible="False" IsRunning="False"
+                               Color="#FF9900" HorizontalOptions="Center"/>
+
+            <!-- Boutons -->
+            <Button Text="💾 Enregistrer comme brouillon"
                     Clicked="OnSaveDraftClicked"
                     BackgroundColor="#FF9900"
                     TextColor="White"
                     CornerRadius="12"
-                    HeightRequest="50"
-                    FontAttributes="Bold"/>
+                    HeightRequest="52"
+                    FontAttributes="Bold"
+                    FontSize="15"/>
 
-            <Button Text="Cancel"
+            <Button Text="Annuler"
                     Clicked="OnCancelClicked"
                     BackgroundColor="Transparent"
-                    TextColor="Gray"
-                    BorderColor="LightGray"
-                    BorderWidth="1"
+                    TextColor="#718096"
+                    BorderColor="#CBD5E0"
+                    BorderWidth="1.5"
                     CornerRadius="12"
-                    HeightRequest="44"/>
+                    HeightRequest="46"
+                    FontSize="14"/>
 
-            <ActivityIndicator x:Name="Loader" IsVisible="False" IsRunning="False"
-                               Color="#FF9900" HorizontalOptions="Center"/>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
