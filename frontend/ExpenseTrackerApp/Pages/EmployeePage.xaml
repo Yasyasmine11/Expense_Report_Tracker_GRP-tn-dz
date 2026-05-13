@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ExpenseTrackerApp.Pages.EmployeePage"
+             Title="My Expenses"
+             BackgroundColor="#F5F5F5">
+
+    <Shell.TitleView>
+        <Grid ColumnDefinitions="*,Auto">
+            <Label Text="My Expenses" FontSize="18" FontAttributes="Bold"
+                   VerticalOptions="Center" TextColor="White"/>
+            <Button Grid.Column="1" Text="Logout" FontSize="12"
+                    BackgroundColor="Transparent" TextColor="White"
+                    Clicked="OnLogoutClicked"/>
+        </Grid>
+    </Shell.TitleView>
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="16">
+
+        <!-- Stats rapides -->
+        <HorizontalStackLayout Grid.Row="0" Spacing="12" Margin="0,0,0,16">
+            <Frame x:Name="DraftBadge" BackgroundColor="White" CornerRadius="10"
+                   Padding="12,8" BorderColor="Transparent">
+                <VerticalStackLayout>
+                    <Label x:Name="DraftCount" Text="0" FontSize="20"
+                           FontAttributes="Bold" HorizontalOptions="Center" TextColor="Gray"/>
+                    <Label Text="Draft" FontSize="11" TextColor="Gray" HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </Frame>
+            <Frame BackgroundColor="White" CornerRadius="10"
+                   Padding="12,8" BorderColor="Transparent">
+                <VerticalStackLayout>
+                    <Label x:Name="SubmittedCount" Text="0" FontSize="20"
+                           FontAttributes="Bold" HorizontalOptions="Center" TextColor="Orange"/>
+                    <Label Text="Pending" FontSize="11" TextColor="Gray" HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </Frame>
+            <Frame BackgroundColor="White" CornerRadius="10"
+                   Padding="12,8" BorderColor="Transparent">
+                <VerticalStackLayout>
+                    <Label x:Name="ApprovedCount" Text="0" FontSize="20"
+                           FontAttributes="Bold" HorizontalOptions="Center" TextColor="Green"/>
+                    <Label Text="Approved" FontSize="11" TextColor="Gray" HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </Frame>
+        </HorizontalStackLayout>
+
+        <!-- Liste -->
+        <RefreshView Grid.Row="1" x:Name="RefreshView" Refreshing="OnRefresh" >
+            <CollectionView x:Name="ExpensesList" EmptyView="No expenses yet. Create one below!">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Margin="0,4" Padding="14" CornerRadius="12"
+                               BackgroundColor="White" BorderColor="Transparent" HasShadow="False">
+                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
+
+                                <Label Grid.Row="0" Grid.Column="0"
+                                       Text="{Binding Description}"
+                                       FontAttributes="Bold" FontSize="15"/>
+
+                                <Label Grid.Row="0" Grid.Column="1"
+                                       Text="{Binding AmountFormatted}"
+                                       FontAttributes="Bold" FontSize="16"
+                                       TextColor="#FF9900" HorizontalOptions="End"/>
+
+                                <Label Grid.Row="1" Grid.Column="0"
+                                       Text="{Binding Category}"
+                                       TextColor="Gray" FontSize="12" Margin="0,2,0,0"/>
+
+                                <Label Grid.Row="1" Grid.Column="1"
+                                       Text="{Binding StatusBadge}"
+                                       FontSize="12" HorizontalOptions="End"
+                                       TextColor="{Binding StatusColor}"/>
+
+                                <!-- Bouton Submit (visible seulement si CanSubmit) -->
+                                <HorizontalStackLayout Grid.Row="2" Grid.ColumnSpan="2"
+                                    Margin="0,8,0,0" Spacing="8"
+                                    IsVisible="{Binding CanSubmit}">
+                                    <Button Text="📤 Submit"
+                                            BackgroundColor="#FF9900" TextColor="White"
+                                            CornerRadius="6" FontSize="12" HeightRequest="34"
+                                            CommandParameter="{Binding ExpenseId}"
+                                            Clicked="OnSubmitClicked"/>
+                                    <Button Text="📎 Attach receipt"
+                                            BackgroundColor="#E8F4FD" TextColor="#2B6CB0"
+                                            CornerRadius="6" FontSize="12" HeightRequest="34"
+                                            CommandParameter="{Binding ExpenseId}"
+                                            Clicked="OnUploadReceiptClicked"
+                                            IsVisible="{Binding CanUploadReceipt}"/>
+                                </HorizontalStackLayout>
+
+                                <!-- Justification si rejeté -->
+                                <Label Grid.Row="2" Grid.ColumnSpan="2"
+                                       Text="{Binding Justification, StringFormat='Reason: {0}'}"
+                                       TextColor="Red" FontSize="12" Margin="0,6,0,0"
+                                       IsVisible="{Binding Justification, Converter={StaticResource NotEmptyConverter}}"/>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+        <!-- Bouton créer -->
+        <Button Grid.Row="2"
+                Text="+ New Expense"
+                Clicked="OnCreateClicked"
+                BackgroundColor="#FF9900"
+                TextColor="White"
+                CornerRadius="12"
+                HeightRequest="50"
+                FontAttributes="Bold"
+                FontSize="16"
+                Margin="0,12,0,0"/>
+
+    </Grid>
+</ContentPage>

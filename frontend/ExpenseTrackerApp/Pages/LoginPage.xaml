@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ExpenseTrackerApp.Pages.LoginPage"
+             Title="Expense Tracker"
+             BackgroundColor="#F5F5F5">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="40,60,40,40" Spacing="0" VerticalOptions="Center">
+
+            <!-- Logo / titre -->
+            <Label Text="💼" FontSize="60" HorizontalOptions="Center" Margin="0,0,0,8"/>
+            <Label Text="Expense Tracker"
+                   FontSize="28" FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="#1A1A2E" Margin="0,0,0,4"/>
+            <Label Text="Sign in to your account"
+                   FontSize="14" TextColor="Gray"
+                   HorizontalOptions="Center" Margin="0,0,0,40"/>
+
+            <!-- Card -->
+            <Frame BackgroundColor="White" CornerRadius="16"
+                   Padding="24" HasShadow="True" BorderColor="Transparent">
+                <VerticalStackLayout Spacing="16">
+
+                    <!-- Email -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Email" FontSize="13" TextColor="Gray"/>
+                        <Entry x:Name="EmailEntry"
+                               Placeholder="alice@company.com"
+                               Keyboard="Email"
+                               ReturnType="Next"
+                               BackgroundColor="#F8F8F8"/>
+                    </VerticalStackLayout>
+
+                    <!-- Password -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Password" FontSize="13" TextColor="Gray"/>
+                        <Entry x:Name="PasswordEntry"
+                               Placeholder="••••••••"
+                               IsPassword="True"
+                               ReturnType="Done"
+                               ReturnCommand="{Binding LoginCommand}"
+                               BackgroundColor="#F8F8F8"/>
+                    </VerticalStackLayout>
+
+                    <!-- Error -->
+                    <Label x:Name="ErrorLabel"
+                           TextColor="#E53E3E"
+                           FontSize="13"
+                           IsVisible="False"
+                           HorizontalOptions="Center"/>
+
+                    <!-- Login Button -->
+                    <Button x:Name="LoginButton"
+                            Text="Sign In"
+                            Clicked="OnLoginClicked"
+                            BackgroundColor="#FF9900"
+                            TextColor="White"
+                            CornerRadius="10"
+                            HeightRequest="48"
+                            FontAttributes="Bold"
+                            Margin="0,8,0,0"/>
+
+                    <ActivityIndicator x:Name="Loader"
+                                       IsVisible="False"
+                                       IsRunning="False"
+                                       Color="#FF9900"
+                                       HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Comptes de test -->
+            <Frame BackgroundColor="#FFF8E1" CornerRadius="10"
+                   Padding="16" BorderColor="#FFE082" Margin="0,24,0,0">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="🧪 Test accounts" FontAttributes="Bold" FontSize="13"/>
+                    <Label Text="Employee : alice@test.com / Employee1234!" FontSize="12" TextColor="Gray"/>
+                    <Label Text="Finance  : bob@test.com / Manager1234!"   FontSize="12" TextColor="Gray"/>
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

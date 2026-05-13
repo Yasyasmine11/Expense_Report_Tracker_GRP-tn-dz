@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:pages="clr-namespace:ExpenseTrackerApp.Pages"
+       x:Class="ExpenseTrackerApp.AppShell"
+       Shell.NavBarTextColor="White"
+       Shell.BackgroundColor="#FF9900">
+
+    <!-- Page de login (page initiale) -->
+    <ShellContent Route="LoginPage"
+                  ContentTemplate="{DataTemplate pages:LoginPage}"
+                  Title="Login"/>
+
+    <!-- Vue employé -->
+    <ShellContent Route="EmployeePage"
+                  ContentTemplate="{DataTemplate pages:EmployeePage}"
+                  Title="My Expenses"/>
+
+    <!-- Vue manager -->
+    <ShellContent Route="ManagerPage"
+                  ContentTemplate="{DataTemplate pages:ManagerPage}"
+                  Title="Approvals"/>
+
+    <!-- Création d'expense (navigation modale) -->
+    <ShellContent Route="CreateExpensePage"
+                  ContentTemplate="{DataTemplate pages:CreateExpensePage}"
+                  Title="New Expense"
+                  IsVisible="False"/>
+
+</Shell>

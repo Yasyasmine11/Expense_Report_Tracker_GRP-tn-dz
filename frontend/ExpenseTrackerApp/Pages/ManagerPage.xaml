@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ExpenseTrackerApp.Pages.ManagerPage"
+             Title="Pending Approvals"
+             BackgroundColor="#F5F5F5">
+
+    <Shell.TitleView>
+        <Grid ColumnDefinitions="*,Auto">
+            <Label Text="Pending Approvals" FontSize="18" FontAttributes="Bold"
+                   VerticalOptions="Center" TextColor="White"/>
+            <Button Grid.Column="1" Text="Logout" FontSize="12"
+                    BackgroundColor="Transparent" TextColor="White"
+                    Clicked="OnLogoutClicked"/>
+        </Grid>
+    </Shell.TitleView>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Header stats -->
+        <Frame Grid.Row="0" BackgroundColor="#FF9900" CornerRadius="0"
+               Padding="16,12" BorderColor="Transparent">
+            <HorizontalStackLayout Spacing="8">
+                <Label Text="📋" FontSize="20"/>
+                <Label x:Name="PendingCountLabel"
+                       Text="0 expenses waiting for review"
+                       TextColor="White" FontSize="15" FontAttributes="Bold"
+                       VerticalOptions="Center"/>
+            </HorizontalStackLayout>
+        </Frame>
+
+        <!-- Liste des expenses à reviewer -->
+        <RefreshView Grid.Row="1" x:Name="RefreshView" Refreshing="OnRefresh">
+            <CollectionView x:Name="PendingList"
+                            Margin="16"
+                            EmptyView="🎉 No pending expenses!">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Margin="0,6" Padding="16" CornerRadius="14"
+                               BackgroundColor="White" BorderColor="Transparent" HasShadow="False">
+                            <VerticalStackLayout Spacing="10">
+
+                                <!-- Montant + catégorie -->
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding Description}"
+                                               FontAttributes="Bold" FontSize="16"/>
+                                        <Label Text="{Binding Category}"
+                                               TextColor="Gray" FontSize="13"/>
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="1"
+                                           Text="{Binding AmountFormatted}"
+                                           FontAttributes="Bold" FontSize="22"
+                                           TextColor="#FF9900" VerticalOptions="Center"/>
+                                </Grid>
+
+                                <!-- Infos utilisateur -->
+                                <Label Text="{Binding UserEmail, StringFormat='👤 {0}'}"
+                                       TextColor="#555" FontSize="13"/>
+                                <Label Text="{Binding CreatedAt, StringFormat='📅 Submitted: {0}'}"
+                                       TextColor="Gray" FontSize="12"/>
+
+                                <BoxView HeightRequest="1" Color="#F0F0F0"/>
+
+                                <!-- Champ justification -->
+                                <Entry x:Name="JustificationEntry"
+                                       Placeholder="Justification (required for rejection)"
+                                       BackgroundColor="#F8F8F8"
+                                       FontSize="13"/>
+
+                                <!-- Boutons Approve / Reject -->
+                                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                    <Button Grid.Column="0"
+                                            Text="✅ Approve"
+                                            BackgroundColor="#38A169"
+                                            TextColor="White"
+                                            CornerRadius="10"
+                                            HeightRequest="44"
+                                            FontAttributes="Bold"
+                                            CommandParameter="{Binding .}"
+                                            Clicked="OnApproveClicked"/>
+                                    <Button Grid.Column="1"
+                                            Text="❌ Reject"
+                                            BackgroundColor="#E53E3E"
+                                            TextColor="White"
+                                            CornerRadius="10"
+                                            HeightRequest="44"
+                                            FontAttributes="Bold"
+                                            CommandParameter="{Binding .}"
+                                            Clicked="OnRejectClicked"/>
+                                </Grid>
+
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>
