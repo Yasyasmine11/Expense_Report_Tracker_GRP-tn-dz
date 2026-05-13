@@ -14,6 +14,8 @@
          MAUI normally sets this via imported SDK targets, but VS evaluates OutputType before those targets load. -->
     <OutputType Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">WinExe</OutputType>
     <OutputType Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) != 'windows'">Exe</OutputType>
+    <!-- Unpackaged mode: no MSIX, no logo images needed, runs directly as .exe -->
+    <WindowsPackageType Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">None</WindowsPackageType>
     <!-- Force x64 on Windows -->
     <Platforms>AnyCPU;x64;x86;ARM64</Platforms>
     <PlatformTarget Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">x64</PlatformTarget>
