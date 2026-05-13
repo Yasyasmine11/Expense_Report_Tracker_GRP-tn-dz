@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rapport – Expense Report Tracker · 5ENTAPP</title>
+  <style>
+    /* ── Reset ──────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Palette AWS / Corporate ───────────────────────────── */
+    :root {
+      --aws-orange : #FF9900;
+      --aws-blue   : #232F3E;
+      --aws-light  : #F8F8F8;
+      --accent     : #1A7AB8;
+      --text       : #1a1a1a;
+      --muted      : #555;
+      --border     : #ddd;
+      --code-bg    : #1E1E2E;
+      --code-fg    : #CDD6F4;
+      --green      : #2ECC71;
+      --red        : #E74C3C;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 11.5pt;
+      line-height: 1.65;
+      color: var(--text);
+      background: #fff;
+    }
+
+    /* ── Print / page breaks ────────────────────────────────── */
+    @media print {
+      @page { size: A4; margin: 18mm 18mm 22mm 18mm; }
+      .page { page-break-after: always; break-after: page; }
+      .page:last-child { page-break-after: avoid; break-after: avoid; }
+      body { font-size: 10.5pt; }
+      pre  { font-size: 8.5pt; }
+    }
+
+    .page {
+      max-width: 820px;
+      margin: 0 auto 60px;
+      padding: 0 30px;
+    }
+
+    /* ── Cover / page 1 ─────────────────────────────────────── */
+    .cover {
+      min-height: 95vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 40px 30px 30px;
+    }
+
+    .cover-header { display: flex; align-items: center; gap: 12px; }
+    .cover-header .logo-bar {
+      height: 6px; width: 50px; background: var(--aws-orange); border-radius: 3px;
+    }
+    .cover-header span { font-size: 12pt; color: var(--muted); font-weight: 600; letter-spacing: .05em; }
+
+    .cover-title {
+      text-align: center;
+      padding: 40px 0;
+    }
+    .cover-title h1 {
+      font-size: 28pt;
+      font-weight: 800;
+      color: var(--aws-blue);
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+    .cover-title h1 span { color: var(--aws-orange); }
+    .cover-title .subtitle {
+      font-size: 13pt;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .cover-title .subtitle2 {
+      font-size: 11pt;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .cover-badges {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+    .badge {
+      background: var(--aws-blue);
+      color: #fff;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 9.5pt;
+      font-weight: 600;
+    }
+    .badge.orange { background: var(--aws-orange); }
+
+    .cover-meta {
+      background: var(--aws-light);
+      border-left: 4px solid var(--aws-orange);
+      border-radius: 0 8px 8px 0;
+      padding: 14px 20px;
+    }
+    .cover-meta table { width: 100%; border-collapse: collapse; }
+    .cover-meta td { padding: 4px 8px; font-size: 10.5pt; }
+    .cover-meta td:first-child { font-weight: 700; color: var(--aws-blue); width: 160px; }
+
+    /* ── Section headings ───────────────────────────────────── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 32px 0 16px;
+    }
+    .section-header .num {
+      background: var(--aws-orange);
+      color: #fff;
+      font-weight: 800;
+      font-size: 13pt;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .section-header h2 {
+      font-size: 16pt;
+      font-weight: 800;
+      color: var(--aws-blue);
+    }
+    h3 { font-size: 12pt; font-weight: 700; color: var(--accent); margin: 20px 0 8px; }
+    h4 { font-size: 11pt; font-weight: 700; color: var(--muted); margin: 14px 0 6px; }
+
+    p { margin-bottom: 10px; }
+
+    /* ── Divider ────────────────────────────────────────────── */
+    .divider { border: none; border-top: 2px solid var(--aws-orange); margin: 20px 0; opacity: .35; }
+
+    /* ── Architecture diagram ───────────────────────────────── */
+    .arch-diagram {
+      background: var(--aws-blue);
+      color: #e8eaed;
+      border-radius: 12px;
+      padding: 24px;
+      font-family: 'Courier New', monospace;
+      font-size: 9pt;
+      line-height: 1.5;
+      margin: 16px 0;
+      overflow-x: auto;
+    }
+    .arch-layer {
+      border: 1px solid rgba(255,153,0,.45);
+      border-radius: 8px;
+      padding: 10px 16px;
+      margin: 8px 0;
+      position: relative;
+    }
+    .arch-layer .layer-label {
+      font-size: 8pt;
+      font-weight: 700;
+      color: var(--aws-orange);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 4px;
+    }
+
+    /* ── Tables ─────────────────────────────────────────────── */
+    table.styled {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 10.5pt;
+    }
+    table.styled thead tr { background: var(--aws-blue); color: #fff; }
+    table.styled thead th { padding: 10px 12px; text-align: left; font-weight: 700; }
+    table.styled tbody tr:nth-child(even) { background: var(--aws-light); }
+    table.styled tbody td { padding: 9px 12px; border-bottom: 1px solid var(--border); }
+    table.styled tbody td code { background: rgba(26,122,184,.08); padding: 2px 5px; border-radius: 3px; font-size: 9.5pt; }
+
+    /* ── Code blocks ────────────────────────────────────────── */
+    pre {
+      background: var(--code-bg);
+      color: var(--code-fg);
+      border-radius: 8px;
+      padding: 16px 20px;
+      overflow-x: auto;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: 9pt;
+      line-height: 1.55;
+      margin: 12px 0;
+    }
+    code { font-family: 'Cascadia Code', 'Consolas', monospace; }
+    .kw   { color: #CBA6F7; }   /* keywords */
+    .ty   { color: #89B4FA; }   /* types */
+    .str  { color: #A6E3A1; }   /* strings */
+    .cm   { color: #6C7086; font-style: italic; } /* comments */
+    .fn   { color: #89DCEB; }   /* functions */
+    .nu   { color: #FAB387; }   /* numbers */
+
+    /* ── Info / warning boxes ───────────────────────────────── */
+    .info-box {
+      border-left: 4px solid var(--accent);
+      background: rgba(26,122,184,.07);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      margin: 12px 0;
+    }
+    .warn-box {
+      border-left: 4px solid var(--aws-orange);
+      background: rgba(255,153,0,.07);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      margin: 12px 0;
+    }
+
+    /* ── State machine ──────────────────────────────────────── */
+    .state-machine {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+      margin: 18px 0;
+    }
+    .state {
+      border: 2.5px solid var(--aws-blue);
+      border-radius: 30px;
+      padding: 9px 20px;
+      font-weight: 700;
+      font-size: 10.5pt;
+      min-width: 105px;
+      text-align: center;
+    }
+    .state.draft     { border-color: #7F8C8D; color: #7F8C8D; }
+    .state.submitted { border-color: var(--accent); color: var(--accent); }
+    .state.approved  { border-color: var(--green); color: var(--green); }
+    .state.rejected  { border-color: var(--red); color: var(--red); }
+    .arrow {
+      font-size: 16pt;
+      color: var(--muted);
+      padding: 0 6px;
+      line-height: 1;
+    }
+
+    /* ── Lists ──────────────────────────────────────────────── */
+    ul, ol { padding-left: 22px; margin: 8px 0 12px; }
+    li { margin-bottom: 4px; }
+
+    /* ── Footer ─────────────────────────────────────────────── */
+    .page-footer {
+      border-top: 1px solid var(--border);
+      padding-top: 8px;
+      margin-top: 30px;
+      font-size: 9pt;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* ── API endpoint table ─────────────────────────────────── */
+    .method {
+      display: inline-block;
+      font-weight: 700;
+      font-size: 8.5pt;
+      padding: 2px 7px;
+      border-radius: 4px;
+      color: #fff;
+    }
+    .method.post { background: #27AE60; }
+    .method.get  { background: var(--accent); }
+    .method.put  { background: #F39C12; }
+
+    /* ── Two-col layout ─────────────────────────────────────── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 12px 0;
+    }
+    .card {
+      background: var(--aws-light);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .card h4 { margin-top: 0; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 1 – COUVERTURE + INTRODUCTION
+══════════════════════════════════════════════════════════════ -->
+<div class="page cover">
+
+  <div class="cover-header">
+    <div class="logo-bar"></div>
+    <span>ESTIAM · Master 2 · 5ENTAPP / E5WMD</span>
+  </div>
+
+  <div class="cover-title">
+    <h1><span>Expense Report</span> Tracker</h1>
+    <div class="subtitle">Application AWS Serverless de gestion de notes de frais</div>
+    <div class="subtitle2">Rapport technique – Architecture, Implémentation &amp; Résultats</div>
+
+    <div class="cover-badges">
+      <span class="badge orange">AWS Lambda</span>
+      <span class="badge">DynamoDB</span>
+      <span class="badge">API Gateway</span>
+      <span class="badge">Cognito</span>
+      <span class="badge">S3</span>
+      <span class="badge orange">.NET MAUI</span>
+    </div>
+  </div>
+
+  <div class="cover-meta">
+    <table>
+      <tr><td>Module</td><td>5ENTAPP / E5WMD – Enterprise Software Engineering on AWS</td></tr>
+      <tr><td>Enseignant</td><td>Dr. Abdelhak TOUITI</td></tr>
+      <tr><td>Formation</td><td>Master 2 – ESTIAM Paris</td></tr>
+      <tr><td>Date</td><td>Mai 2026</td></tr>
+      <tr><td>Dépôt GitHub</td><td>Expense_Report_Tracker_GRP-tn-dz</td></tr>
+      <tr><td>Région AWS</td><td>eu-west-3 (Paris)</td></tr>
+    </table>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- Introduction sur la même page -->
+  <div class="section-header">
+    <div class="num">1</div>
+    <h2>Introduction &amp; Problème industriel</h2>
+  </div>
+
+  <h3>1.1 Contexte</h3>
+  <p>
+    Dans les entreprises modernes, la gestion des notes de frais est un processus critique
+    qui souffre encore, dans de nombreuses organisations, d'un manque de digitalisation :
+    formulaires papier, e-mails non tracés, délais de remboursement longs et risques d'erreur
+    ou de fraude élevés.
+  </p>
+
+  <h3>1.2 Problème industriel adressé</h3>
+  <p>Ce projet répond à trois enjeux concrets :</p>
+  <ul>
+    <li><strong>Traçabilité :</strong> chaque note doit être horodatée, associée à un employé et suivre un cycle de vie précis (création → soumission → approbation/rejet).</li>
+    <li><strong>Contrôle d'accès :</strong> seul un responsable financier (rôle <em>finance</em>) peut approuver ou rejeter ; l'employé ne peut agir que sur ses propres notes.</li>
+    <li><strong>Justificatifs numériques :</strong> les reçus doivent être stockés de manière sécurisée et accessibles uniquement via des URLs temporaires.</li>
+  </ul>
+
+  <h3>1.3 Objectifs du projet</h3>
+  <div class="two-col">
+    <div class="card">
+      <h4>Côté technique</h4>
+      <ul>
+        <li>Architecture 100 % serverless sur AWS</li>
+        <li>Authentification JWT via Amazon Cognito</li>
+        <li>API REST sécurisée (API Gateway + Cognito Authorizer)</li>
+        <li>Frontend multiplateforme (.NET MAUI)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Côté métier</h4>
+      <ul>
+        <li>Cycle de vie DRAFT → SUBMITTED → APPROVED/REJECTED</li>
+        <li>RBAC basé sur les groupes Cognito</li>
+        <li>Upload de justificatifs via pre-signed URLs S3</li>
+        <li>Déploiement continu via AWS CLI</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Expense Report Tracker · 5ENTAPP · ESTIAM Paris · 2026</span>
+    <span>Page 1 / 5</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 2 – ARCHITECTURE
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+
+  <div class="section-header">
+    <div class="num">2</div>
+    <h2>Architecture choisie</h2>
+  </div>
+
+  <h3>2.1 Vue d'ensemble – Architecture Serverless AWS</h3>
+
+  <div class="arch-diagram">
+<pre style="background:transparent;color:inherit;padding:0;margin:0;font-size:9pt;">
+  ┌──────────────────────────────────────────────────────────────────────┐
+  │                        .NET MAUI Application                         │
+  │              (Vue Employé / Vue Finance Manager)                      │
+  │         Android  ·  Windows  ·  (iOS / macOS optionnel)             │
+  └────────────────────────────┬─────────────────────────────────────────┘
+                               │  HTTPS + Bearer Token (JWT Cognito)
+                               ▼
+  ┌──────────────────────────────────────────────────────────────────────┐
+  │                Amazon API Gateway  (REST API)                         │
+  │         Cognito Authorizer  ·  CORS  ·  Throttling                   │
+  └──┬──────────┬──────────┬──────────┬──────────┬───────────┬──────────┘
+     │          │          │          │          │           │
+     ▼          ▼          ▼          ▼          ▼           ▼
+  Create    GetList   Submit    Approve    Reject    GetUploadUrl
+  Expense  Expenses   Expense   Expense   Expense    + GetById
+     │          │          │          │          │           │
+     └──────────┴──────────┴──────────┴──────────┴───────────┘
+                               │  AWS Lambda (.NET 8 / C#)
+                ┌──────────────┴──────────────┐
+                ▼                             ▼
+  ┌─────────────────────┐       ┌────────────────────────────┐
+  │  Amazon DynamoDB    │       │       Amazon S3             │
+  │  Table: Expense     │       │  Bucket: receipts           │
+  │  Reports            │       │  Pre-signed URLs (PUT/GET)  │
+  │  GSI: StatusIndex   │       │  Expiration: 10 min        │
+  └─────────────────────┘       └────────────────────────────┘
+                ▲
+  ┌─────────────────────┐
+  │   Amazon Cognito    │
+  │   User Pool         │
+  │   Groupes:          │
+  │   • employees       │
+  │   • finance         │
+  └─────────────────────┘</pre>
+  </div>
+
+  <h3>2.2 Justification des choix technologiques</h3>
+
+  <table class="styled">
+    <thead>
+      <tr><th>Service AWS</th><th>Rôle</th><th>Justification</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>AWS Lambda</strong></td>
+        <td>Logique métier</td>
+        <td>Pas de serveur à gérer, paiement à l'usage, scalabilité automatique</td>
+      </tr>
+      <tr>
+        <td><strong>API Gateway</strong></td>
+        <td>Point d'entrée REST</td>
+        <td>Intégration native Cognito, CORS, throttling, logging CloudWatch</td>
+      </tr>
+      <tr>
+        <td><strong>Amazon Cognito</strong></td>
+        <td>Authentification &amp; RBAC</td>
+        <td>JWT standards, groupes = rôles, sans gestion de mdp côté app</td>
+      </tr>
+      <tr>
+        <td><strong>DynamoDB</strong></td>
+        <td>Stockage NoSQL</td>
+        <td>Single-table design, latence &lt; 10 ms, GSI pour les access patterns managers</td>
+      </tr>
+      <tr>
+        <td><strong>Amazon S3</strong></td>
+        <td>Stockage reçus</td>
+        <td>URLs pré-signées = jamais d'exposition directe du bucket, durée de vie limitée</td>
+      </tr>
+      <tr>
+        <td><strong>IAM Role</strong></td>
+        <td>Sécurité</td>
+        <td>Least-privilege : Lambda accède uniquement à DynamoDB + S3, pas d'accès console</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>2.3 Endpoints API déployés</h3>
+  <p>Base URL : <code>https://rwfqaety92.execute-api.eu-west-3.amazonaws.com/prod</code></p>
+
+  <table class="styled">
+    <thead>
+      <tr><th>Méthode</th><th>Chemin</th><th>Lambda</th><th>Rôle requis</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="method post">POST</span></td><td><code>/expenses</code></td><td>CreateExpense</td><td>employees</td></tr>
+      <tr><td><span class="method get">GET</span></td><td><code>/expenses</code></td><td>GetExpenses</td><td>employees / finance</td></tr>
+      <tr><td><span class="method get">GET</span></td><td><code>/expenses/{id}</code></td><td>GetExpenseById</td><td>employees / finance</td></tr>
+      <tr><td><span class="method put">PUT</span></td><td><code>/expenses/{id}/submit</code></td><td>SubmitExpense</td><td>employees</td></tr>
+      <tr><td><span class="method put">PUT</span></td><td><code>/expenses/{id}/approve</code></td><td>ApproveExpense</td><td>finance</td></tr>
+      <tr><td><span class="method put">PUT</span></td><td><code>/expenses/{id}/reject</code></td><td>RejectExpense</td><td>finance</td></tr>
+      <tr><td><span class="method get">GET</span></td><td><code>/expenses/{id}/upload-url</code></td><td>GetUploadUrl</td><td>employees</td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-footer">
+    <span>Expense Report Tracker · 5ENTAPP · ESTIAM Paris · 2026</span>
+    <span>Page 2 / 5</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 3 – MODÈLE DYNAMODB
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+
+  <div class="section-header">
+    <div class="num">3</div>
+    <h2>Modèle de données DynamoDB</h2>
+  </div>
+
+  <h3>3.1 Approche Single-Table Design</h3>
+  <p>
+    DynamoDB favorise le <em>single-table design</em> : une seule table stocke tous les types
+    d'entités. Les clés composites (PK + SK) permettent de modéliser des relations et
+    de répondre à plusieurs access patterns sans jointure ni scan coûteux.
+  </p>
+
+  <h3>3.2 Structure de la table <code>ExpenseReports</code></h3>
+
+  <table class="styled">
+    <thead>
+      <tr><th>Attribut</th><th>Type</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>PK</code></td><td>String</td><td>Partition key — <code>USER#&lt;userId&gt;</code> (UUID Cognito sub)</td></tr>
+      <tr><td><code>SK</code></td><td>String</td><td>Sort key — <code>EXPENSE#&lt;expenseId&gt;</code> (UUID v4)</td></tr>
+      <tr><td><code>expenseId</code></td><td>String</td><td>Identifiant unique de la note de frais</td></tr>
+      <tr><td><code>userId</code></td><td>String</td><td>Identifiant Cognito de l'employé</td></tr>
+      <tr><td><code>userEmail</code></td><td>String</td><td>Email de l'employé (issu du claim JWT)</td></tr>
+      <tr><td><code>amount</code></td><td>Number</td><td>Montant en euros</td></tr>
+      <tr><td><code>category</code></td><td>String</td><td>Catégorie (Transport, Repas, Hébergement…)</td></tr>
+      <tr><td><code>description</code></td><td>String</td><td>Description libre de la dépense</td></tr>
+      <tr><td><code>status</code></td><td>String</td><td>État courant : DRAFT | SUBMITTED | APPROVED | REJECTED</td></tr>
+      <tr><td><code>StatusGSI_PK</code></td><td>String</td><td>Clé du GSI — <code>STATUS#&lt;status&gt;</code></td></tr>
+      <tr><td><code>receiptKey</code></td><td>String</td><td>Clé S3 du justificatif (optionnel)</td></tr>
+      <tr><td><code>justification</code></td><td>String</td><td>Motif de rejet (rempli par le manager)</td></tr>
+      <tr><td><code>reviewedBy</code></td><td>String</td><td>sub Cognito du manager ayant statué</td></tr>
+      <tr><td><code>createdAt</code></td><td>String</td><td>ISO 8601 UTC — date de création</td></tr>
+      <tr><td><code>updatedAt</code></td><td>String</td><td>ISO 8601 UTC — dernière mise à jour</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.3 Index secondaire global (GSI) : <code>StatusIndex</code></h3>
+  <div class="two-col">
+    <div class="card">
+      <h4>Configuration</h4>
+      <ul>
+        <li>Hash key : <code>StatusGSI_PK</code></li>
+        <li>Range key : <code>SK</code></li>
+        <li>Projection : ALL</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Utilité</h4>
+      <p>Permet au Finance Manager de récupérer <em>toutes</em> les notes avec un statut donné
+      (ex : <code>STATUS#SUBMITTED</code>) sans scanner la table entière.</p>
+    </div>
+  </div>
+
+  <h3>3.4 Access Patterns couverts</h3>
+
+  <table class="styled">
+    <thead>
+      <tr><th>Cas d'usage</th><th>Opération DynamoDB</th><th>Clé utilisée</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Employé : voir ses notes</td>
+        <td>Query</td>
+        <td><code>PK = USER#&lt;userId&gt;</code>, SK begins_with <code>EXPENSE#</code></td>
+      </tr>
+      <tr>
+        <td>Récupérer une note précise</td>
+        <td>GetItem</td>
+        <td><code>PK = USER#&lt;userId&gt;</code>, <code>SK = EXPENSE#&lt;id&gt;</code></td>
+      </tr>
+      <tr>
+        <td>Manager : notes soumises</td>
+        <td>Query (GSI)</td>
+        <td><code>StatusGSI_PK = STATUS#SUBMITTED</code></td>
+      </tr>
+      <tr>
+        <td>Mettre à jour un statut</td>
+        <td>UpdateItem</td>
+        <td><code>PK + SK</code> + UpdateExpression sur <code>status</code>, <code>StatusGSI_PK</code></td>
+      </tr>
+      <tr>
+        <td>Manager : toutes catégories</td>
+        <td>Query (GSI)</td>
+        <td><code>StatusGSI_PK = STATUS#APPROVED</code> / <code>STATUS#REJECTED</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="info-box">
+    <strong>Avantage clé :</strong> Aucun <em>Scan</em> n'est réalisé dans l'application.
+    Chaque accès est un <em>Query</em> ou un <em>GetItem</em> ciblé, garantissant des latences
+    constantes (&lt; 5 ms) quelle que soit la taille de la table.
+  </div>
+
+  <h3>3.5 Ressources S3</h3>
+  <p>
+    Le bucket <strong>expense-tracker-receipts-706922781773</strong> stocke les reçus sous la
+    clé <code>receipts/{userId}/{expenseId}.jpg</code>. Le bucket est privé : aucun accès
+    public n'est autorisé. Les fichiers sont accessibles uniquement via des pre-signed URLs
+    PUT générées par Lambda, valables 10 minutes.
+  </p>
+
+  <div class="page-footer">
+    <span>Expense Report Tracker · 5ENTAPP · ESTIAM Paris · 2026</span>
+    <span>Page 3 / 5</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 4 – CODE CLÉ
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+
+  <div class="section-header">
+    <div class="num">4</div>
+    <h2>Code clé – RBAC, State Machine &amp; Pre-signed URL</h2>
+  </div>
+
+  <h3>4.1 Contrôle d'accès RBAC via les claims Cognito</h3>
+  <p>
+    Amazon Cognito injecte les groupes de l'utilisateur dans le token JWT sous le claim
+    <code>cognito:groups</code>. API Gateway valide la signature du token et transmet les
+    claims à Lambda via le contexte du requêteur.
+  </p>
+
+<pre><span class="cm">// Lecture du claim depuis le contexte API Gateway</span>
+<span class="kw">var</span> claims = request.RequestContext.Authorizer.Claims;
+
+<span class="cm">// Méthode helper partagée dans chaque Lambda</span>
+<span class="kw">private static bool</span> <span class="fn">IsFinanceManager</span>(<span class="ty">IDictionary</span>&lt;<span class="ty">string</span>, <span class="ty">string</span>&gt; claims)
+{
+    <span class="kw">if</span> (claims.<span class="fn">TryGetValue</span>(<span class="str">"cognito:groups"</span>, <span class="kw">out var</span> groups))
+        <span class="kw">return</span> groups.<span class="fn">Contains</span>(<span class="str">"finance"</span>);
+    <span class="kw">return false</span>;
+}
+
+<span class="cm">// Exemple d'utilisation dans ApproveExpense</span>
+<span class="kw">if</span> (!<span class="fn">IsFinanceManager</span>(claims))
+    <span class="kw">return</span> <span class="fn">Forbidden</span>(<span class="str">"Only Finance Managers can approve expense reports."</span>);</pre>
+
+  <p>
+    L'identifiant de l'utilisateur connecté est extrait du claim <code>sub</code> (UUID stable),
+    ce qui évite toute usurpation d'identité : l'employé ne peut accéder qu'à ses propres notes
+    (la PK DynamoDB est construite sur son <code>sub</code>).
+  </p>
+
+  <h3>4.2 Machine à états – Cycle de vie d'une note de frais</h3>
+
+  <div class="state-machine">
+    <div class="state draft">DRAFT</div>
+    <div class="arrow">→</div>
+    <div class="state submitted">SUBMITTED</div>
+    <div class="arrow">→</div>
+    <div class="state approved">APPROVED</div>
+  </div>
+  <div class="state-machine" style="margin-top:4px;">
+    <div style="min-width:105px"></div>
+    <div class="arrow">↘</div>
+    <div class="state rejected">REJECTED</div>
+    <div class="arrow">→</div>
+    <div class="state submitted" style="font-size:9pt;">(re-soumission possible)</div>
+  </div>
+
+  <p style="margin-top:12px;">Les transitions sont validées <strong>côté serveur</strong> dans chaque Lambda.
+  Le client ne peut pas forcer un statut invalide :</p>
+
+<pre><span class="cm">// Dans ApproveExpense — validation de la transition</span>
+<span class="kw">var</span> currentStatus = getResult.Item[<span class="str">"status"</span>].S;
+
+<span class="kw">if</span> (currentStatus != <span class="str">"SUBMITTED"</span>)
+{
+    <span class="kw">return</span> <span class="fn">BadRequest</span>(
+        <span class="str">$"Cannot approve an expense with status '{currentStatus}'. "</span> +
+        <span class="str">"Only SUBMITTED expenses can be approved."</span>);
+}
+
+<span class="cm">// Mise à jour atomique dans DynamoDB</span>
+<span class="kw">await</span> _dynamo.<span class="fn">UpdateItemAsync</span>(<span class="kw">new</span> <span class="ty">UpdateItemRequest</span>
+{
+    TableName = _tableName,
+    Key = <span class="kw">new</span>() {
+        [<span class="str">"PK"</span>] = <span class="kw">new</span>() { S = <span class="str">$"USER#{body.UserId}"</span> },
+        [<span class="str">"SK"</span>] = <span class="kw">new</span>() { S = <span class="str">$"EXPENSE#{expenseId}"</span> }
+    },
+    UpdateExpression = <span class="str">"SET #s = :s, StatusGSI_PK = :gsi, reviewedBy = :mgr, updatedAt = :ts"</span>,
+    ExpressionAttributeValues = <span class="kw">new</span>() {
+        [<span class="str">":s"</span>]   = <span class="kw">new</span>() { S = <span class="str">"APPROVED"</span> },
+        [<span class="str">":gsi"</span>] = <span class="kw">new</span>() { S = <span class="str">"STATUS#APPROVED"</span> }
+    }
+});</pre>
+
+  <h3>4.3 Upload sécurisé via Pre-signed URLs S3</h3>
+  <p>
+    Le reçu n'est jamais transmis via l'API. Lambda génère une URL signée valide 10 minutes,
+    que le client utilise pour un upload direct sur S3 :
+  </p>
+
+<pre><span class="cm">// GetUploadUrl Lambda — génération de la pre-signed URL</span>
+<span class="kw">var</span> presignRequest = <span class="kw">new</span> <span class="ty">GetPreSignedUrlRequest</span>
+{
+    BucketName  = _bucketName,
+    Key         = <span class="str">$"receipts/{userId}/{expenseId}.jpg"</span>,
+    Verb        = <span class="ty">HttpVerb</span>.PUT,
+    Expires     = <span class="ty">DateTime</span>.UtcNow.<span class="fn">AddMinutes</span>(<span class="nu">10</span>),
+    ContentType = <span class="str">"image/jpeg"</span>
+};
+
+<span class="kw">var</span> uploadUrl = _s3.<span class="fn">GetPreSignedURL</span>(presignRequest);
+
+<span class="cm">// La clé S3 est sauvegardée dans DynamoDB pour référence future</span>
+<span class="kw">await</span> _dynamo.<span class="fn">UpdateItemAsync</span>(...  <span class="str">"SET receiptKey = :k"</span> ...);</pre>
+
+  <div class="warn-box">
+    <strong>Sécurité :</strong> Le bucket S3 a le blocage d'accès public activé. Seul Lambda
+    (via son rôle IAM) peut générer des URLs pré-signées. Chaque URL est liée à une clé
+    spécifique et expire après 10 minutes, limitant la fenêtre d'exposition.
+  </div>
+
+  <h3>4.4 Frontend .NET MAUI – Navigation par rôle</h3>
+  <p>
+    Après l'authentification Cognito, le claim <code>cognito:groups</code> est décodé
+    côté client (JWT) pour router vers la bonne vue :
+  </p>
+
+<pre><span class="cm">// LoginPage.xaml.cs — redirection post-login</span>
+<span class="kw">if</span> (result.IsFinanceManager)
+    <span class="kw">await</span> Shell.Current.<span class="fn">GoToAsync</span>(<span class="str">"//ManagerPage"</span>);
+<span class="kw">else</span>
+    <span class="kw">await</span> Shell.Current.<span class="fn">GoToAsync</span>(<span class="str">"//EmployeePage"</span>);</pre>
+
+  <div class="page-footer">
+    <span>Expense Report Tracker · 5ENTAPP · ESTIAM Paris · 2026</span>
+    <span>Page 4 / 5</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 5 – CONCLUSION
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+
+  <div class="section-header">
+    <div class="num">5</div>
+    <h2>Conclusion, Difficultés &amp; Améliorations</h2>
+  </div>
+
+  <h3>5.1 Bilan – Ce qui a été réalisé</h3>
+
+  <table class="styled">
+    <thead>
+      <tr><th>Composant</th><th>Statut</th><th>Détail</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Infrastructure AWS</td><td style="color:var(--green);font-weight:700;">✓ Déployé</td><td>DynamoDB + S3 + Cognito User Pool + IAM Role + API Gateway</td></tr>
+      <tr><td>7 Lambda functions</td><td style="color:var(--green);font-weight:700;">✓ Déployées</td><td>C# .NET 8, eu-west-3, rôle IAM minimal</td></tr>
+      <tr><td>Cognito Authorizer</td><td style="color:var(--green);font-weight:700;">✓ Configuré</td><td>Toutes les routes /prod sauf OPTIONS</td></tr>
+      <tr><td>Test end-to-end</td><td style="color:var(--green);font-weight:700;">✓ Validé</td><td>Create → Submit → Approve (alice employee, bob finance)</td></tr>
+      <tr><td>Frontend MAUI</td><td style="color:var(--green);font-weight:700;">✓ Compilé</td><td>Login, EmployeePage, ManagerPage, CreateExpensePage (0 erreur build)</td></tr>
+      <tr><td>RBAC</td><td style="color:var(--green);font-weight:700;">✓ Fonctionnel</td><td>Rôle employee / finance séparés, 403 si non autorisé</td></tr>
+      <tr><td>State Machine</td><td style="color:var(--green);font-weight:700;">✓ Fonctionnel</td>
+      <td>Validation server-side, transitions invalides bloquées avec message d'erreur</td></tr>
+      <tr><td>Pre-signed URLs S3</td><td style="color:var(--green);font-weight:700;">✓ Fonctionnel</td><td>Upload reçus, bucket privé, TTL 10 min</td></tr>
+      <tr><td>Déploiement GitHub</td><td style="color:var(--green);font-weight:700;">✓ Poussé</td><td>27 fichiers, commit feat: deploy all lambdas + complete MAUI frontend</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.2 Difficultés rencontrées</h3>
+
+  <div class="two-col">
+    <div class="card">
+      <h4>Backend – AWS</h4>
+      <ul>
+        <li><strong>Conflits de SDK .NET :</strong> le projet utilisait <code>net8.0</code> côté Lambda mais <code>net9.0</code> côté MAUI. Résolu en maintenant les deux séparément.</li>
+        <li><strong>Cognito Authorizer :</strong> configuration manuelle de chaque route dans API Gateway pour associer l'authorizer tout en excluant les routes OPTIONS (CORS preflight).</li>
+        <li><strong>GSI StatusIndex :</strong> les requêtes des managers nécessitaient de connaître exactement la valeur de clé de partition du GSI (<code>STATUS#SUBMITTED</code>), ce qui a imposé une discipline de nommage stricte à l'écriture.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Frontend – .NET MAUI</h4>
+      <ul>
+        <li><strong>SDK mismatch :</strong> Visual Studio 2026 charge .NET 10 SDK par défaut, mais le workload MAUI n'est installé que sur .NET 9.0.203. Résolu via <code>global.json</code>.</li>
+        <li><strong>Shell.NavBarTextColor :</strong> attribut déprécié en .NET MAUI 9 → remplacé par <code>Shell.TitleColor</code> et <code>Shell.ForegroundColor</code>.</li>
+        <li><strong>Packaging Windows :</strong> MAUI Windows nécessite Windows App Runtime (WinUI 3). Installation manuelle requise sur la machine de développement.</li>
+        <li><strong>Format .sln :</strong> <code>dotnet new sln</code> génère un format <code>.slnx</code> non reconnu par VS. Création manuelle d'un <code>.sln</code> classique.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>5.3 Axes d'amélioration</h3>
+  <ul>
+    <li><strong>Infrastructure as Code :</strong> remplacer le script bash par AWS CDK ou Terraform pour un déploiement reproductible et versionné.</li>
+    <li><strong>Notifications :</strong> intégrer Amazon SNS ou SES pour notifier l'employé par e-mail lors d'une approbation ou d'un rejet.</li>
+    <li><strong>Pagination :</strong> les requêtes DynamoDB sont actuellement limitées à 1 Mo. Ajouter un mécanisme de pagination avec <code>LastEvaluatedKey</code> pour les grands volumes.</li>
+    <li><strong>CI/CD :</strong> pipeline GitHub Actions pour déployer automatiquement les Lambdas sur chaque push main.</li>
+    <li><strong>Observabilité :</strong> AWS X-Ray pour le tracing distribué (API Gateway → Lambda → DynamoDB) et métriques CloudWatch Dashboard.</li>
+    <li><strong>Tests unitaires :</strong> ajouter des tests xUnit pour chaque Lambda avec mocks DynamoDB (Moq + Amazon.DynamoDBv2.Mock).</li>
+    <li><strong>Refresh token :</strong> gérer l'expiration du JWT côté MAUI avec rotation automatique du token via Cognito <code>REFRESH_TOKEN_AUTH</code>.</li>
+  </ul>
+
+  <hr class="divider" />
+
+  <h3>5.4 Synthèse</h3>
+  <p>
+    Ce projet démontre la faisabilité d'une application d'entreprise entièrement serverless
+    sur AWS, avec une gestion des rôles robuste (Cognito + RBAC), une persistance NoSQL
+    optimisée (DynamoDB single-table + GSI), un stockage sécurisé des justificatifs (S3
+    pre-signed URLs) et un frontend multiplateforme (.NET MAUI).
+  </p>
+  <p>
+    L'ensemble de l'infrastructure a été déployé et testé en conditions réelles
+    (région <strong>eu-west-3 Paris</strong>), validant un flux complet de bout en bout :
+    création de note → soumission par l'employé → approbation par le manager financier.
+  </p>
+
+  <div class="info-box">
+    <strong>Dépôt GitHub :</strong> <code>Expense_Report_Tracker_GRP-tn-dz</code> —
+    commit <code>7a6c25e</code> — 27 fichiers, infrastructure complète + frontend MAUI.
+  </div>
+
+  <div class="page-footer">
+    <span>Expense Report Tracker · 5ENTAPP · ESTIAM Paris · 2026</span>
+    <span>Page 5 / 5</span>
+  </div>
+</div>
+
+</body>
+</html>
