@@ -7,10 +7,9 @@ public static class AppConfig
 {
     // Cognito
     public const string CognitoRegion   = "eu-west-3";
-    public const string UserPoolId      = "eu-west-3_XXXXXXXXX";   // ← à remplacer
-    public const string AppClientId     = "XXXXXXXXXXXXXXXXXXXXXXXXXX"; // ← à remplacer
+    public const string UserPoolId      = "eu-west-3_IFDSxyrQK";
+    public const string AppClientId     = "42l7n46ng7hciqqb5degcdoiq9";
 
     // API Gateway
-    public const string ApiBaseUrl      = "https://XXXXXXXXXX.execute-api.eu-west-3.amazonaws.com/prod";
-    // ← à remplacer après déploiement API Gateway
+    public const string ApiBaseUrl      = "https://rwfqaety92.execute-api.eu-west-3.amazonaws.com/prod";
 }

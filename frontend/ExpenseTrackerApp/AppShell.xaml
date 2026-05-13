@@ -3,8 +3,9 @@
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
        xmlns:pages="clr-namespace:ExpenseTrackerApp.Pages"
        x:Class="ExpenseTrackerApp.AppShell"
-       Shell.NavBarTextColor="White"
-       Shell.BackgroundColor="#FF9900">
+       Shell.BackgroundColor="#FF9900"
+       Shell.TitleColor="White"
+       Shell.ForegroundColor="White">
 
     <!-- Page de login (page initiale) -->
     <ShellContent Route="LoginPage"

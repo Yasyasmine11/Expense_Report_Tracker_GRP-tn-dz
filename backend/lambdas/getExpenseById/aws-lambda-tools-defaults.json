@@ -1,0 +1,11 @@
+{
+  "profile": "",
+  "region": "eu-west-3",
+  "configuration": "Release",
+  "function-runtime": "dotnet8",
+  "function-memory-size": 256,
+  "function-timeout": 30,
+  "function-handler": "getExpenseById::GetExpenseById.Function::FunctionHandler",
+  "function-role": "arn:aws:iam::706922781773:role/lambda-expense-tracker-role",
+  "environment-variables": "TABLE_NAME=ExpenseReports"
+}

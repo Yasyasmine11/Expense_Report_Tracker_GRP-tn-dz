@@ -62,12 +62,6 @@
 
                                 <BoxView HeightRequest="1" Color="#F0F0F0"/>
 
-                                <!-- Champ justification -->
-                                <Entry x:Name="JustificationEntry"
-                                       Placeholder="Justification (required for rejection)"
-                                       BackgroundColor="#F8F8F8"
-                                       FontSize="13"/>
-
                                 <!-- Boutons Approve / Reject -->
                                 <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                                     <Button Grid.Column="0"
