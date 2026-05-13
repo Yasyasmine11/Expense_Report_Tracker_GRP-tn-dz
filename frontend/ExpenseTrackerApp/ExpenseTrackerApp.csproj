@@ -10,7 +10,11 @@
     <ApplicationId>com.expensetracker.app</ApplicationId>
     <ApplicationVersion>1</ApplicationVersion>
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
-    <!-- Force x64 on Windows so VS doesn't default to AnyCPU (which breaks MAUI launch) -->
+    <!-- Explicit OutputType so VS project system recognises this as a launchable app (not a class library).
+         MAUI normally sets this via imported SDK targets, but VS evaluates OutputType before those targets load. -->
+    <OutputType Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">WinExe</OutputType>
+    <OutputType Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) != 'windows'">Exe</OutputType>
+    <!-- Force x64 on Windows -->
     <Platforms>AnyCPU;x64;x86;ARM64</Platforms>
     <PlatformTarget Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">x64</PlatformTarget>
     <RuntimeIdentifier Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">win-x64</RuntimeIdentifier>
