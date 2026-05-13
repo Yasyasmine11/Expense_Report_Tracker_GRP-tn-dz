@@ -10,6 +10,10 @@
     <ApplicationId>com.expensetracker.app</ApplicationId>
     <ApplicationVersion>1</ApplicationVersion>
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <!-- Force x64 on Windows so VS doesn't default to AnyCPU (which breaks MAUI launch) -->
+    <Platforms>AnyCPU;x64;x86;ARM64</Platforms>
+    <PlatformTarget Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">x64</PlatformTarget>
+    <RuntimeIdentifier Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">win-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>
