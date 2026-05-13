@@ -826,7 +826,180 @@
 
   <div class="page-footer">
     <span>Expense Report Tracker · 5ENTAPP · ESTIAM Paris · 2026</span>
-    <span>Page 5 / 5</span>
+    <span>Page 5 / 6</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE 6 – MONITORING & SÉCURITÉ AWS
+══════════════════════════════════════════════════════════════ -->
+<div class="page">
+
+  <div class="section-header">
+    <div class="num">6</div>
+    <h2>Monitoring, Sécurité &amp; Résilience AWS</h2>
+  </div>
+
+  <h3>6.1 CloudWatch Dashboard – Vue temps réel</h3>
+  <p>
+    Un dashboard CloudWatch <strong>ExpenseTracker-Overview</strong> a été configuré en région
+    <code>eu-west-3</code> pour superviser l'ensemble de l'infrastructure en temps réel.
+    Il regroupe quatre graphiques couvrant les dimensions critiques de l'application :
+  </p>
+
+  <table class="styled">
+    <thead>
+      <tr><th>Widget</th><th>Métriques surveillées</th><th>Utilité</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Lambda Invocations</strong></td>
+        <td>CreateExpense, GetExpenses, SubmitExpense, ApproveExpense, RejectExpense</td>
+        <td>Visualiser le volume d'activité par fonction</td>
+      </tr>
+      <tr>
+        <td><strong>Lambda Errors</strong></td>
+        <td>Erreurs sur CreateExpense, ApproveExpense, RejectExpense</td>
+        <td>Détecter immédiatement les régressions</td>
+      </tr>
+      <tr>
+        <td><strong>Lambda Duration</strong></td>
+        <td>Durée moyenne des 3 fonctions les plus critiques</td>
+        <td>Surveiller les dégradations de performance</td>
+      </tr>
+      <tr>
+        <td><strong>API Gateway Requests</strong></td>
+        <td>Count total, 4XXError, 5XXError — stage prod</td>
+        <td>Distinguer erreurs client vs erreurs serveur</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>6.2 CloudWatch Alarm – Détection d'erreurs automatique</h3>
+
+  <p>
+    Une alarme <strong>ExpenseTracker-Lambda-Errors</strong> a été configurée avec les paramètres suivants :
+  </p>
+
+  <div class="two-col">
+    <div class="card">
+      <h4>Configuration de l'alarme</h4>
+      <ul>
+        <li>Namespace : <code>AWS/Lambda</code></li>
+        <li>Métrique : <code>Errors</code></li>
+        <li>Seuil : <strong>≥ 5 erreurs</strong> en 5 minutes</li>
+        <li>Évaluation : 1 point de données</li>
+        <li>Missing data : treated as OK</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>États de l'alarme</h4>
+      <ul>
+        <li><span style="color:#2ECC71;font-weight:bold;">✅ OK</span> — moins de 5 erreurs (état normal)</li>
+        <li><span style="color:#E74C3C;font-weight:bold;">🔴 IN ALARM</span> — incident détecté → notification</li>
+        <li><span style="color:#888;font-weight:bold;">⚪ Insufficient data</span> — démarrage / pas d'activité</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="info-box" style="margin-top:14px;">
+    <strong>État observé :</strong> Alarme en statut <strong>OK</strong> — aucune erreur Lambda détectée lors des tests de validation end-to-end (flux Create → Submit → Approve).
+  </div>
+
+  <h3>6.3 DynamoDB – Sauvegarde et résilience</h3>
+
+  <table class="styled">
+    <thead>
+      <tr><th>Fonctionnalité</th><th>Configuration</th><th>Bénéfice</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Point-in-Time Recovery (PITR)</strong></td>
+        <td>✅ Activé — fenêtre 35 jours</td>
+        <td>Restauration à la seconde près en cas de suppression accidentelle</td>
+      </tr>
+      <tr>
+        <td><strong>Capacity mode</strong></td>
+        <td>On-demand</td>
+        <td>Pas de provisioning, scaling automatique, coût à l'usage</td>
+      </tr>
+      <tr>
+        <td><strong>Chiffrement</strong></td>
+        <td>AES-256 (AWS managed key)</td>
+        <td>Données chiffrées au repos par défaut</td>
+      </tr>
+      <tr>
+        <td><strong>GSI StatusIndex</strong></td>
+        <td>Hash: StatusGSI_PK / Range: SK</td>
+        <td>Accès O(1) pour les managers sans scan de table</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>6.4 Amazon S3 – Sécurité des reçus</h3>
+
+  <table class="styled">
+    <thead>
+      <tr><th>Mesure</th><th>Valeur</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Accès public</strong></td>
+        <td>❌ Bloqué (Block Public Access activé)</td>
+      </tr>
+      <tr>
+        <td><strong>Politique d'accès</strong></td>
+        <td>Seul le rôle IAM Lambda peut générer des pre-signed URLs</td>
+      </tr>
+      <tr>
+        <td><strong>CORS</strong></td>
+        <td>PUT/GET/HEAD autorisés — Content-Type image/jpeg — TTL 1h</td>
+      </tr>
+      <tr>
+        <td><strong>Clé S3</strong></td>
+        <td><code>receipts/{userId}/{expenseId}.jpg</code> — isolation par employé</td>
+      </tr>
+      <tr>
+        <td><strong>Expiration URL</strong></td>
+        <td>10 minutes — fenêtre d'upload limitée</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>6.5 IAM – Principe du moindre privilège</h3>
+  <p>
+    Le rôle IAM <strong>expense-tracker-lambda-role</strong> attaché à toutes les Lambda ne donne accès
+    qu'aux services strictement nécessaires :
+  </p>
+
+  <div class="two-col">
+    <div class="card">
+      <h4>Permissions accordées</h4>
+      <ul>
+        <li><code>dynamodb:GetItem</code></li>
+        <li><code>dynamodb:PutItem</code></li>
+        <li><code>dynamodb:UpdateItem</code></li>
+        <li><code>dynamodb:Query</code></li>
+        <li><code>s3:GetObject</code>, <code>s3:PutObject</code></li>
+        <li><code>logs:CreateLogGroup</code>, <code>logs:PutLogEvents</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Permissions refusées (implicitement)</h4>
+      <ul>
+        <li>❌ Accès à d'autres tables DynamoDB</li>
+        <li>❌ Accès à d'autres buckets S3</li>
+        <li>❌ Accès IAM, EC2, RDS, etc.</li>
+        <li>❌ Console AWS</li>
+        <li>❌ Suppression de données</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Expense Report Tracker · 5ENTAPP · ESTIAM Paris · 2026</span>
+    <span>Page 6 / 6</span>
   </div>
 </div>
 
