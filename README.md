@@ -9,7 +9,7 @@
 |---|---|
 | Elyes Boudabous | [@Boudabous2001](https://github.com/Boudabous2001) |
 | Yasmine Aoudjit | [@Yasyasmine11](https://github.com/Yasyasmine11) |
-| Mohamed Amine Dhaoui | — |
+| Mohamed Amine Dhaoui | [@medaminedh](https://github.com/medaminedha) |
 
 ## Architecture
 
