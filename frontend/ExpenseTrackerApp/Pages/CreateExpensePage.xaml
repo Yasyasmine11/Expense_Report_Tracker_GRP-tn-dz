@@ -72,6 +72,28 @@
                 </VerticalStackLayout>
             </Border>
 
+            <!-- Reçu -->
+            <Border BackgroundColor="White" StrokeShape="RoundRectangle 12"
+                    Stroke="#E2E8F0" Padding="16,14">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Reçu (optionnel)" FontAttributes="Bold" FontSize="13" TextColor="#4A5568"/>
+                    <Button x:Name="PickFileBtn"
+                            Text="📎 Choisir une photo"
+                            Clicked="OnPickFileClicked"
+                            BackgroundColor="#EBF4FF"
+                            TextColor="#3182CE"
+                            BorderColor="#BEE3F8"
+                            BorderWidth="1.5"
+                            CornerRadius="8"
+                            HeightRequest="44"
+                            FontSize="13"/>
+                    <Label x:Name="FileNameLabel"
+                           Text="Aucun fichier sélectionné"
+                           TextColor="#A0AEC0"
+                           FontSize="12"/>
+                </VerticalStackLayout>
+            </Border>
+
             <!-- Erreur -->
             <Border x:Name="ErrorBox"
                     BackgroundColor="#FFF5F5"
