@@ -3,6 +3,14 @@
 > Module 5ENTAPP / E5WMD · Enterprise Software Engineering on AWS  
 > Dr. Abdelhak TOUITI · Master 2 · ESTIAM Paris
 
+## Équipe
+
+| Nom | GitHub |
+|---|---|
+| Elyes Boudabous | [@Boudabous2001](https://github.com/Boudabous2001) |
+| Yasmine Aoudjit | [@Yasyasmine11](https://github.com/Yasyasmine11) |
+| Mohamed Amine Dhaoui | — |
+
 ## Architecture
 
 ```
